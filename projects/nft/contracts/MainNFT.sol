@@ -194,7 +194,7 @@ contract TestNFT is ERC721Enumerable, Ownable, TokenTransferrer {
     if(!success) revert InsufficentLiquidity();
     balance = address(this).balance;
 
-    // 
+    // creates st
   }
 
   /**

@@ -29,6 +29,7 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
   let beforeBalance, beforeBalanceOwner;
   let changedBalance, changedBalanceOwner;
+  let _balance;
   let div10 = "10000000000";
   let div18 = "100000000000000000";
   let div10bn = BN(div10);
@@ -312,8 +313,6 @@ contract("Main NFT", ([owner, operator, ...users]) => {
     });
 
     it("Check stake (rebate)", async () => {
-      let _balance;
-
       console.log("stake of #20:");
       beforeStake = await mainNFT.checkStake(20, { from: users[1] });
       //console.log(beforeStake)
@@ -367,11 +366,41 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
     it("Claim stake (rebate)", async () => {
       startTimestamp = await time.latest();
-      await time.increaseTo(startTimestamp.add(new BN("1"))); // second
-      await time.increaseTo(startTimestamp.add(new BN("60"))); // minute
-      await time.increaseTo(startTimestamp.add(new BN("3600"))); // hour
-      await time.increaseTo(startTimestamp.add(new BN("86400"))); // day
-      await time.increaseTo(startTimestamp.add(new BN("3110400"))); // year
+
+      // perform stake after 1 second
+      // ----------------------------------------------------------------------
+      console.log("before claim stake of #27:");
+      beforeStake = await mainNFT.checkStake(27, { from: users[1] });
+      //console.log(beforeStake)
+      _balance = await balance.current(mainNFT.contract._address);
+      //console.log("contract bal: ", +BN(_balance).div(div10bn).toString() / 100000000);
+      console.log("balance: ", +(await balance.current(beforeStake[5])).div(div10bn).toString() / 100000000);
+      console.log("remaining: ", +BN(beforeStake[3]).div(div10bn).toString() / 100000000);
+      console.log("initial: ", +BN(beforeStake[4]).div(div10bn).toString() / 100000000);
+
+      await time.increaseTo((await time.latest()).add(new BN("1"))); // second
+      await mainNFT.claimStake(27);
+
+      console.log("after claim stake of #27:");
+      beforeStake = await mainNFT.checkStake(27, { from: users[1] });
+      //console.log(beforeStake)
+      _balance = await balance.current(mainNFT.contract._address);
+      //console.log("contract bal: ", +BN(_balance).div(div10bn).toString() / 100000000);
+      console.log("balance: ", +(await balance.current(beforeStake[5])).div(div10bn).toString() / 100000000);
+      console.log("remaining: ", +BN(beforeStake[3]).div(div10bn).toString() / 100000000);
+      console.log("initial: ", +BN(beforeStake[4]).div(div10bn).toString() / 100000000);
+
+      // cannot claim twice in 24hr period
+      //expectRevert(await mainNFT.claimStake(27));
+
+
+
+
+      //await time.increaseTo(startTimestamp.add(new BN("1"))); // second
+      //await time.increaseTo(startTimestamp.add(new BN("60"))); // minute
+      //await time.increaseTo(startTimestamp.add(new BN("3600"))); // hour
+      //await time.increaseTo(startTimestamp.add(new BN("86400"))); // day
+      //await time.increaseTo(startTimestamp.add(new BN("3110400"))); // year
     });
 
     it("User cannot buy tickets before startTimestamp", async () => {
