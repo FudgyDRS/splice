@@ -365,21 +365,24 @@ contract("Main NFT", ([owner, operator, ...users]) => {
     });
 
     it("Claim stake (rebate)", async () => {
-      startTimestamp = await time.latest();
+      await mainNFT.claimStake(21, { from: users[1] });
+      await time.increaseTo((await time.latest()).add(new BN("3600")));
+      expectRevert(await mainNFT.claimStake(21, { from: users[1] }), "OncePerDay(uint256, uint256");
 
-      // perform stake after 1 second
+      // perform stake after 1 year
       // ----------------------------------------------------------------------
       console.log("before claim stake of #27:");
       beforeStake = await mainNFT.checkStake(27, { from: users[1] });
-      //console.log(beforeStake)
+      console.log(beforeStake)
       _balance = await balance.current(mainNFT.contract._address);
       //console.log("contract bal: ", +BN(_balance).div(div10bn).toString() / 100000000);
       console.log("balance: ", +(await balance.current(beforeStake[5])).div(div10bn).toString() / 100000000);
       console.log("remaining: ", +BN(beforeStake[3]).div(div10bn).toString() / 100000000);
       console.log("initial: ", +BN(beforeStake[4]).div(div10bn).toString() / 100000000);
+      console.log("current time: ", (await time.latest()).toString());
 
-      await time.increaseTo((await time.latest()).add(new BN("1"))); // second
-      await mainNFT.claimStake(27);
+      await time.increaseTo((await time.latest()).add(new BN("31536000"))); // second
+      await mainNFT.claimStake(27, { from: users[1] });
 
       console.log("after claim stake of #27:");
       beforeStake = await mainNFT.checkStake(27, { from: users[1] });
@@ -389,6 +392,7 @@ contract("Main NFT", ([owner, operator, ...users]) => {
       console.log("balance: ", +(await balance.current(beforeStake[5])).div(div10bn).toString() / 100000000);
       console.log("remaining: ", +BN(beforeStake[3]).div(div10bn).toString() / 100000000);
       console.log("initial: ", +BN(beforeStake[4]).div(div10bn).toString() / 100000000);
+      console.log("current time: ", (await time.latest()).toString());
 
       // cannot claim twice in 24hr period
       //expectRevert(await mainNFT.claimStake(27));
@@ -400,7 +404,7 @@ contract("Main NFT", ([owner, operator, ...users]) => {
       //await time.increaseTo(startTimestamp.add(new BN("60"))); // minute
       //await time.increaseTo(startTimestamp.add(new BN("3600"))); // hour
       //await time.increaseTo(startTimestamp.add(new BN("86400"))); // day
-      //await time.increaseTo(startTimestamp.add(new BN("3110400"))); // year
+      //await time.increaseTo(startTimestamp.add(new BN("31516000"))); // year
     });
 
     it("User cannot buy tickets before startTimestamp", async () => {
