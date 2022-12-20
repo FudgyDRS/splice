@@ -3,8 +3,13 @@
   "description": "Splice contracts",
   "version": "1.0.0",
   "private": true,
+  "explorer.autoRevealExclude": {
+    "**/node_modules": true,
+    "**/bower_components": true
+  },
   "workspaces": [
-    "projects/*/**"
+    "projects/nft/*",
+    "projects/token/*"
   ],
   "repository": "https://github.com/fudgylabs/splice-contracts",
   "author": "Splice",
@@ -33,7 +38,7 @@
     "eslint": "^8.27.0",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.7.2",
-    "hardhat": "^2.12.2",
+    "hardhat": "^2.12.4",
     "hardhat-abi-exporter": "^2.10.1",
     "hardhat-contract-sizer": "^2.6.1",
     "hardhat-watcher": "^2.5.0",

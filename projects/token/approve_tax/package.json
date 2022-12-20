@@ -1,5 +1,5 @@
 {
-  "name": "nft",
+  "name": "token-approve_tax",
   "version": "1.0.0",
   "description": "NFT + APY distributor",
   "main": "index.js",

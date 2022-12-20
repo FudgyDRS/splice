@@ -1,5 +1,5 @@
 {
-  "name": "nft-rebate_stake",
+  "name": "nft-erc1155",
   "version": "1.0.0",
   "description": "NFT + APY distributor",
   "main": "index.js",
