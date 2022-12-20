@@ -19,6 +19,18 @@ contract TestNFT is ERC721Enumerable, Ownable, TokenTransferrer {
   using SafeERC20 for IERC20;
   using Strings for uint256;
 
+  struct stake {
+    uint256 start;
+    uint256 end;
+    uint256 last;
+    uint256 remaining;
+    uint256 initial;
+    address owner;
+  }
+
+  mapping(uint256 => stake) stakeId;
+  uint256 _balance = 0;
+
   uint256 public immutable maxSupply;
   uint256 public payoutPeriod;
 
@@ -124,18 +136,6 @@ contract TestNFT is ERC721Enumerable, Ownable, TokenTransferrer {
     return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString(), ".json")) : "";
   }
 
-  struct stake {
-    uint256 start;
-    uint256 end;
-    uint256 last;
-    uint256 remaining;
-    uint256 initial;
-    address owner;
-  }
-
-  mapping(uint256 => stake) stakeId;
-  uint256 _balance = 0;
-
   function transferFrom(
     address from,
     address to,
@@ -200,19 +200,18 @@ contract TestNFT is ERC721Enumerable, Ownable, TokenTransferrer {
     if(!success) revert InsufficentLiquidity();
     _balance = address(this).balance; */
 
-    uint256 time = block.timestamp;
     assembly {
-      let _time := mload(time)
+
+      let _time := timestamp()
+      let _last       := sload(add(_stake.slot, 0x40))
+      if lt(add(_last, 86400), _time) { revert(0, 0) }
+
       let _start      := sload(_stake.slot)
       let _end        := sload(add(_stake.slot, 0x20))
-      let _last       := sload(add(_stake.slot, 0x40))
       let _remaining  := sload(add(_stake.slot, 0x60))
       let _initial    := sload(add(_stake.slot, 0x80))
       let _owner      := sload(add(_stake.slot, 0x100))
-
-      if lt(add(_last, 86400), _time) { revert(0, 0) }
-
-      let _reward := div(mul(_initial, sub(time, _last)), sub(_end, _start))
+      let _reward := div(mul(_initial, sub(_time, _last)), sub(_end, _start))
       if lt(_remaining, _reward) { _reward := _remaining }
       _last := _time
       _remaining := sub(_remaining, _reward)
@@ -262,49 +261,99 @@ contract TestNFT is ERC721Enumerable, Ownable, TokenTransferrer {
 
   uint256 public lastProcessedIndex;
   // gas used == 600000 maybe
-  function process(uint256 gas) public returns (uint256, uint256, uint256) {
+  function process(uint256 _gas) public returns (uint256 iterations, uint256 claims, uint256 _lastProcessedIndex) {
     uint256 numberOfTokenHolders = totalSupply();
 
     if(numberOfTokenHolders == 0) {
       return (0, 0, lastProcessedIndex);
     }
 
-    uint256 _lastProcessedIndex = lastProcessedIndex;
-    uint256 gasUsed = 0;
-    uint256 gasLeft = gasleft();
 
-    uint256 iterations = 0;
-    uint256 claims = 0;
+    assembly {
+      _lastProcessedIndex := add(lastProcessedIndex, 1)
+      let gasUsed := 0
+      let gasLeft := gasleft
+      let _time := timestamp()
+      let ptr_to_stake := _stake.slot
+      while (and(lt(gasUsed, _gas), lt(iteration, numberOfTokenHolders))) {
+        mstore(0, _lastProcessedIndex)
+        mstore(0x20, _stake.slot)
+        sload(add(keccak256(0, 64), var))
+        let _last       := sload(add(ptr_to_stake, 0x40))
+        let _remaining  := sload(add(ptr_to_stake, 0x60))
+        if and(lt(add(_last, 86400), _time), iszero(_remaining)) {
+          let _start      := sload(ptr_to_stake)
+          let _end        := sload(add(ptr_to_stake, 0x20))
+          let _initial    := sload(add(ptr_to_stake, 0x80))
+          let _owner      := sload(add(ptr_to_stake, 0x100))
+          let _reward := div(mul(_initial, sub(_time, _last)), sub(_end, _start))
+          if lt(_remaining, _reward) { _reward := _remaining }
+          _last := _time
+          _remaining := sub(_remaining, _reward)
 
-    while(gasUsed < gas && iterations < numberOfTokenHolders) {
-      _lastProcessedIndex++;
-
-      if(_lastProcessedIndex >= tokenHoldersMap.keys.length) {
-        _lastProcessedIndex = 0;
-      }
-
-      address account = tokenHoldersMap.keys[_lastProcessedIndex];
-
-      if(canAutoClaim(lastClaimTimes[account])) {
-        if(processAccount(payable(account), true)) {
-          claims++;
+          pop(call(gas(), _owner, _reward, 0, 0, 0, 0))
+          sstore(_balance.slot, selfbalance())
+          ptr_to_stake := add(ptr_to_stake, 0x114)
+          claims := add(claims, 1)
         }
+        let netGasLeft := gasleft()
+        if gt(gasLeft, newGasLeft) {
+          gasUsed := add(gasUsed, sub(gasLeft, newGasLeft))
+        }
+        gasLeft := newGasLeft
       }
-
-      iterations++;
-
-      uint256 newGasLeft = gasleft();
-
-      if(gasLeft > newGasLeft) {
-        gasUsed = gasUsed.add(gasLeft.sub(newGasLeft));
+      switch lt(_lastProcessedIndex, lastProcessedIndex)
+      case 0 {
+        iterations := sub(_lastProcessedIndex, lastProcessedIndex)
       }
-
-      gasLeft = newGasLeft;
+      case 1 {
+        iterations := sub(lastProcessedIndex, _lastProcessedIndex)
+      }
+      lastProcessedIndex := _lastProcessedIndex
     }
+    //====================================
 
-    lastProcessedIndex = _lastProcessedIndex;
+    assembly {
+      _lastProcessedIndex := add(lastProcessedIndex, 1)
+      let gasUsed := 0
+      let gasLeft := gasleft
+      let _time := timestamp()
+      let ptr_to_stake := _stake.slot
+      while (and(lt(gasUsed, _gas), lt(iteration, numberOfTokenHolders))) {
+        mstore(0, _lastProcessedIndex)
+        mstore(0x20, _stake.slot)
 
-    return (iterations, claims, lastProcessedIndex);
+        let _last       := sload(add(keccak256(0, 64), 2))
+        let _remaining  := sload(add(keccak256(0, 64), 3))
+        if and(lt(add(_last, 86400), _time), iszero(_remaining)) {
+          let _start      := sload(ptr_to_stake)
+          let _end        := sload(add(keccak256(0, 64), 1))
+          let _initial    := sload(add(keccak256(0, 64), 4))
+          let _owner      := sload(add(keccak256(0, 64), 5))
+          let _reward := div(mul(_initial, sub(_time, _last)), sub(_end, _start))
+          if lt(_remaining, _reward) { _reward := _remaining }
+          _last := _time
+          _remaining := sub(_remaining, _reward)
+
+          pop(call(gas(), _owner, _reward, 0, 0, 0, 0))
+          sstore(_balance.slot, selfbalance())
+          claims := add(claims, 1)
+        }
+        let netGasLeft := gasleft()
+        if gt(gasLeft, newGasLeft) {
+          gasUsed := add(gasUsed, sub(gasLeft, newGasLeft))
+        }
+        gasLeft := newGasLeft
+      }
+      switch lt(_lastProcessedIndex, lastProcessedIndex)
+      case 0 {
+        iterations := sub(_lastProcessedIndex, lastProcessedIndex)
+      }
+      case 1 {
+        iterations := sub(lastProcessedIndex, _lastProcessedIndex)
+      }
+      lastProcessedIndex := _lastProcessedIndex
+    }
   }
 
     function processAccount(address payable account, bool automatic) public onlyOwner returns (bool) {
