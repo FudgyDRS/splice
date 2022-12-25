@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Strings.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Strings.sol";
+
+import "@openzeppelin/contracts-v0.7/access/AccessControl.sol";
+import "@openzeppelin/contracts-v0.7/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts-v0.7/utils/Strings.sol";
 
 
 abstract contract ContextMixin {
@@ -113,7 +117,6 @@ contract EIP712Base is Initializable {
 }
 
 contract NativeMetaTransaction is EIP712Base {
-    using SafeMath for uint256;
     bytes32 private constant META_TRANSACTION_TYPEHASH = keccak256(
         bytes(
             "MetaTransaction(uint256 nonce,address from,bytes functionSignature)"
@@ -156,7 +159,7 @@ contract NativeMetaTransaction is EIP712Base {
         );
 
         // increase nonce for user (to avoid re-use)
-        nonces[userAddress] = nonces[userAddress].add(1);
+        ++nonces[userAddress];
 
         emit MetaTransactionExecuted(
             userAddress,
@@ -261,7 +264,6 @@ contract ProxyRegistry {
  */
 contract ERC1155Tradable is ContextMixin, ERC1155, NativeMetaTransaction, Ownable {
   using Strings for string;
-  using SafeMath for uint256;
 
   address proxyRegistryAddress;
   mapping (uint256 => address) public creators;
@@ -409,7 +411,7 @@ contract ERC1155Tradable is ContextMixin, ERC1155, NativeMetaTransaction, Ownabl
     bytes memory _data
   ) public payable {
     _mint(_to, _id, _quantity, _data);
-    tokenSupply[_id] = tokenSupply[_id].add(_quantity);
+    tokenSupply[_id] = tokenSupply[_id] + _quantity;
     //check price
   }
 
@@ -430,7 +432,7 @@ contract ERC1155Tradable is ContextMixin, ERC1155, NativeMetaTransaction, Ownabl
       uint256 _id = _ids[i];
       require(creators[_id] == _msgSender(), "ERC1155Tradable#batchMint: ONLY_CREATOR_ALLOWED");
       uint256 quantity = _quantities[i];
-      tokenSupply[_id] = tokenSupply[_id].add(quantity);
+      tokenSupply[_id] = tokenSupply[_id] + quantity;
     }
     _mintBatch(_to, _ids, _quantities, _data);
   }

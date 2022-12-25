@@ -270,9 +270,9 @@ contract TestNFT is ERC721Enumerable, Ownable, TokenTransferrer {
 
 
     assembly {
-      _lastProcessedIndex := add(lastProcessedIndex, 1)
+      _lastProcessedIndex := add(mload(lastProcessedIndex.slot), 1)
       let gasUsed := 0
-      let gasLeft := gasleft
+      let gasLeft := gas()
       let _time := timestamp()
       let ptr_to_stake := _stake.slot
       while (and(lt(gasUsed, _gas), lt(iteration, numberOfTokenHolders))) {
@@ -357,14 +357,14 @@ contract TestNFT is ERC721Enumerable, Ownable, TokenTransferrer {
   }
 
     function processAccount(address payable account, bool automatic) public onlyOwner returns (bool) {
-        uint256 amount = _withdrawDividendOfUser(account);
+        //uint256 amount = _withdrawDividendOfUser(account);
 
-    	if(amount > 0) {
-    		lastClaimTimes[account] = block.timestamp;
-            emit Claim(account, amount, automatic);
-    		return true;
-    	}
-
+    	//if(amount > 0) {
+    	//	lastClaimTimes[account] = block.timestamp;
+      //      emit Claim(account, amount, automatic);
+    	//	return true;
+    	//}
+//
     	return false;
     }
 
@@ -471,6 +471,7 @@ interface IDividendPayingTokenOptional {
 to token holders as dividends and allows token holders to withdraw their dividends.
 Reference: the source code of PoWH3D: https://etherscan.io/address/0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe#code
 */
+/*
 contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingTokenOptional {
   using SafeMath for uint256;
   using SafeMathUint for uint256;
@@ -660,7 +661,9 @@ contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingToke
     }
   }
 }
+*/
 
+/*
 contract CakeDividendTracker is DividendPayingToken, Ownable {
     using SafeMath for uint256;
     using SafeMathInt for int256;
@@ -877,3 +880,4 @@ contract CakeDividendTracker is DividendPayingToken, Ownable {
     	return false;
     }
 }
+*/
