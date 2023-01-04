@@ -1,8 +1,13 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
 //function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool)
 
+//sstore(0x0, ?)
+//sstore(0x1, ?)
 //string private _name;
 //string private _symbol;
 
+//sstore(keccak256(0x3))
 //mapping(uint256 => address) private _owners;
 //mapping(address => uint256) private _balances;
 //mapping(uint256 => address) private _tokenApprovals;
