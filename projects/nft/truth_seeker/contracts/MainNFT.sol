@@ -450,21 +450,22 @@ contract TRUTHNFT is Context, ERC165, IERC721, IERC721Metadata, Ownable {
         }
     }
 
-    function ownerMint(address[] calldata to, bytes1[] calldata qty) external onlyOwner {
+    function ownerMint(address[] calldata to, uint256[] calldata qty) external onlyOwner {
         // mint NFTs
-
-        //let listOffset := add(4, calldataload(4))
-        //let listSize := calldataload(4)
-        //let ptr := mload(0x40)
-        //for {let index} gt(listSize, index) { mstore(index, add(index, 1))} {}
-        //calldatacopy(ptr, add(listOffset, 0x20), listSize)
-        //data := mload(ptr)
-        //calldatacopy(ptr, add(listOffset, 0x40), listSize)
-        //data2 := mload(ptr)
-        //calldatacopy(ptr, add(listOffset, 0x60), listSize)
-        //data3 := mload(ptr)
-        //calldatacopy(ptr, add(listOffset, 0x80), listSize)
-        //data4 := mload(ptr)
+        assembly {
+            let listOffset := add(4, calldataload(4))
+            let listSize := calldataload(4)
+            let ptr := mload(0x40)
+            for {let index} gt(listSize, index) { mstore(index, add(index, 1))} {}
+            calldatacopy(ptr, add(listOffset, 0x20), listSize)
+            data := mload(ptr)
+            calldatacopy(ptr, add(listOffset, 0x40), listSize)
+            data2 := mload(ptr)
+            calldatacopy(ptr, add(listOffset, 0x60), listSize)
+            data3 := mload(ptr)
+            calldatacopy(ptr, add(listOffset, 0x80), listSize)
+            data4 := mload(ptr)
+        }
         uint nUsers = to.length;
         for (uint j = 0; j < nUsers; j++) {
             for (uint i = 0; i < qty[j]; i++) {
