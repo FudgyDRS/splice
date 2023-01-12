@@ -2,9 +2,19 @@ __Author: Charles Taylor (FudgyDRS)__
 
 __Co-Author: Maia Divine (Maiazana)__
 
-The purpose of this protocol is to send predefined ERC20 tokens from an existing wallet to a tax wallet provided that the wallet has tokens. Such a system is intended to dettur the early sale of tokens and promote price inflation.
+The purpose of this protocol is the no-code deployment of state contract that function via delegate calls to upgradable proxy contracts.
 
-The system functions by calling the `transferFrom` on any approval, transferring a percent the tax wallet.
+The system functions by calling the directory delegate that calls the directory proxy that points to the contract logic, versions to specific contract can also be locked in place.
+
+Version is indicated as so
+1.2.3
+
+(1) indicates a major revision (possible breaking changes, in that event contracts can be migrated/fixed/locked)
+(2) indicated sufficent revisions to be considered a full update
+(3) minor revisions
+
+DirectoryDelegate.sol
+version 0.0.1 - Intial build
 
 #### Perform tests:
 
