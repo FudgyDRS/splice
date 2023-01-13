@@ -293,6 +293,9 @@ contract Singularity is Context, IERC20, Ownable {
     // uint256 public _maxWalletSize = _tTotal*2/100;                                                       // slot   0x1B
     // uint256 public _swapTokensAtAmount = _tTotal*4/1000;                                                 // slot   0x1C
 
+    // address private _owner;                                                                              // slot   0x1D
+    // address private _previousOwner;                                                                      // slot   0x1E
+
     event MaxTxAmountUpdated(uint256 _maxTxAmount);
     modifier lockTheSwap {
         inSwap = true;
@@ -306,27 +309,96 @@ contract Singularity is Context, IERC20, Ownable {
 
 // IUniswapV2Router02
 // bytes4(keccak256("swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)")): 0x791ac947
-// bytes4(keccak256("factory()")): 0xc45a0155
-// bytes4(keccak256("WETH()")): 0xad5c4648
+// bytes4(keccak256("factory()")): 0xC45A0155
+// bytes4(keccak256("WETH()")): 0xAD5C4648
 // bytes4(keccak256("addLiquidityETH(address,uint256,uint256,uint256,address,uint256 deadline)")): 0x3c300e4d
-    function intialize() external payable {
-      assembly {
-        
-      }
+  function intialize() external payable {
+    assembly {
+      sstore(0x00, 0x53696e67756c6172697479000000000000000000000000000000000000000000) // name
+      sstore(0x01, 0x53544c0000000000000000000000000000000000000000000000000000000000) // symbol
+      sstore(0x02, 0x0000000000000000000000000000000000000000000000000000000000000009) // decimals
 
-        _rOwned[_msgSender()] = _rTotal;
+      sstore(0x08, 0x0000000000000000000000000000000000000000000000000DE0B6B3A7640000) // _maxTxAmount
+      sstore(0x09, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7E52FE5AFE40000) // _rTotal
 
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);//
-        uniswapV2Router = _uniswapV2Router;
-        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
-            .createPair(address(this), _uniswapV2Router.WETH());
+      sstore(0x0C, 0x000000000000000000000000000000000000000000000000000000000000000A) // _taxFeeOnBuy
+      sstore(0x0E, 0x0000000000000000000000000000000000000000000000000000000000000028) // _taxFeeOnSell
 
-        _isExcludedFromFee[owner()] = true;
-        _isExcludedFromFee[address(this)] = true;
-        _isExcludedFromFee[_marketingAddress] = true;
+      sstore(0x10, 0x0000000000000000000000000000000000000000000000000000000000000028) // _taxFee
 
-        emit Transfer(address(0), _msgSender(), _tTotal);
+      sstore(0x13, 0xCE5B611530313EC3C8A6DF585D0206C8721BBAA9000000000000000000000000) // _developmentAddress
+      sstore(0x14, 0xCE5B611530313EC3C8A6DF585D0206C8721BBAA9000000000000000000000000) // _marketingAddress
+
+      sstore(0x15, 0x7A250D5630B4CF539739DF2C5DACB4C659F2488D000000000000000000000000) // uniswapV2Router
+
+      sstore(0x17, 0x0000000000000000000000000000000000000000000000000000000000000001) // tradingOpen
+      sstore(0x18, 0x0000000000000000000000000000000000000000000000000000000000000000) // inSwap
+      sstore(0x19, 0x0000000000000000000000000000000000000000000000000000000000000001) // swapEnabled
+
+      sstore(0x1A, 0x0000000000000000000000000000000000000000000000000DE0B6B3A7640000) // _maxTxAmount
+      sstore(0x1B, 0x00000000000000000000000000000000000000000000000000470DE4DF820000) // _maxWalletSize
+      sstore(0x1C, 0x000000000000000000000000000000000000000000000000000E35FA931A0000) // _swapTokensAtAmount
+
+      sstore(0x1D, caller())                                                           // _owner
+
+      // _rOwned[_msgSender()] = _rTotal;
+      mstore(0x00, caller())
+      mstore(0x20, 0x3)
+      sstore(keccak256(0x00, 0x20), sload(0x09))
+
+      // _uniswapV2Router.factory()
+      mstore(0x00, 0xC45A0155)
+      pop(staticcall(
+          gas(),
+          sload(0x15),
+          0,
+          0x04,
+          0x40,
+          0x20
+      ))
+
+      // _uniswapV2Router.WETH()
+      mstore(0x00, 0xAD5C4648)
+      pop(staticcall(
+          gas(),
+          sload(0x15),
+          0,
+          0x04,
+          0x00,
+          0x20
+      ))
+
+      // IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this), _uniswapV2Router.WETH());
+      mstore(0x00, 0xC45A0155)
+      mstore(add(0x00,0x04), address())
+      mstore(add(0x00,0x18), mload(0x00))
+      pop(call(
+          gas(),
+          mload(0x40),
+          0,
+          0x2C,
+          0,
+          0x20
+      ))
+
+      sstore(0x16, mload(0x00))
+
+      // _isExcludedFromFee[owner()] = true;
+      mstore(0x00, caller())
+      mstore(0x20, 0x06)
+      sstore(keccak256(0x00, 0x20), 0x0000000000000000000000000000000000000000000000000000000000000001)
+
+      // _isExcludedFromFee[address(this)] = true;
+      mstore(0x00, address())
+      sstore(keccak256(0x00, 0x20), 0x0000000000000000000000000000000000000000000000000000000000000001)
+
+      // _isExcludedFromFee[_marketingAddress] = true;
+      mstore(0x00, sload(0x14))
+      sstore(keccak256(0x00, 0x20), 0x0000000000000000000000000000000000000000000000000000000000000001)
     }
+
+    emit Transfer(address(0), _msgSender(), _tTotal);
+  }
 
     function name() public pure returns (string memory) {
         return _name;
