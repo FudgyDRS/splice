@@ -1,8 +1,8 @@
 Thought for another whitelist method:
 
-    We can determine the number of hashes required until an arbitrary number is reached, saving that plus a few bits of the original address should provide sufficient entropy.
+We can determine the number of hashes required until an arbitrary number is reached, saving that plus a few bits of the original address should provide sufficient entropy.
 
-    We can assign the mapping to said whitelists to be true in the instance of whitelists as well, thus we can solve the gas minting issue. Additionally, we can offset the final mapping value when a transfer occurs to set the "true" position as other contracts traditionally use.
+We can assign the mapping to said whitelists to be true in the instance of whitelists as well, thus we can solve the gas minting issue. Additionally, we can offset the final mapping value when a transfer occurs to set the "true" position as other contracts traditionally use.
 
 EX:
 ```
