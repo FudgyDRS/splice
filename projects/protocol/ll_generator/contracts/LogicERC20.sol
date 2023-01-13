@@ -318,7 +318,7 @@ contract Singularity is Context, IERC20, Ownable {
       sstore(0x01, 0x53544c0000000000000000000000000000000000000000000000000000000000) // symbol
       sstore(0x02, 0x0000000000000000000000000000000000000000000000000000000000000009) // decimals
 
-      sstore(0x08, 0x0000000000000000000000000000000000000000000000000DE0B6B3A7640000) // _maxTxAmount
+      sstore(0x08, 0x0000000000000000000000000000000000000000000000000DE0B6B3A7640000) // _tTotal
       sstore(0x09, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7E52FE5AFE40000) // _rTotal
 
       sstore(0x0C, 0x000000000000000000000000000000000000000000000000000000000000000A) // _taxFeeOnBuy
@@ -400,31 +400,61 @@ contract Singularity is Context, IERC20, Ownable {
     emit Transfer(address(0), _msgSender(), _tTotal);
   }
 
-    function name() public pure returns (string memory) {
-        return _name;
+  function name() public pure returns (string memory _name) {
+    assembly {
+      _name := sload(0x00)
     }
+  }
 
-    function symbol() public pure returns (string memory) {
-        return _symbol;
+  function symbol() public pure returns (string memory _symbol) {
+    assembly {
+      _symbol := sload(0x01)
     }
+  }
 
-    function decimals() public pure returns (uint8) {
-        return _decimals;
+  function decimals() public pure returns (uint256 _decimals) {
+    assembly {
+      _decimals := sload(0x03)
     }
+  }
 
-    function totalSupply() public pure override returns (uint256) {
-        return _tTotal;
+  function totalSupply() public pure returns (uint256 _tTotal) {
+    assembly {
+      _tTotal := sload(0x08)
     }
+  }
 
-    function balanceOf(address account) public view override returns (uint256) {
-        return tokenFromReflection(_rOwned[account]);
+  function balanceOf(address account) public pure returns (uint256 _balance) {
+    assembly {
+      mstore(0x00, mload(account))
+      mstore(0x20, 0x03)
+      let rAmount := sload(keccak256(0x00, 0x20))
+      if gt(rAmount, sload(0x09)) { revert(0,0) }
+      _balance := div(rAmount, div(sload(0x09), sload(0x08)))
     }
+  }
 
-    function transfer(address recipient, uint256 amount)
-        public
-        override
-        returns (bool)
+   function tokenFromReflection(uint256 rAmount)
+        private
+        view
+        returns (uint256)
     {
+        require(
+            rAmount <= _rTotal,
+            "Amount must be less than total reflections"
+        );
+        uint256 currentRate = _getRate();
+        return rAmount.div(currentRate);
+    }
+
+  function _getRate() private view returns (uint256) {
+        uint256 rSupply = _rTotal;
+        uint256 tSupply = _tTotal;
+        return rSupply.div(tSupply);
+    }
+
+
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
@@ -464,18 +494,7 @@ contract Singularity is Context, IERC20, Ownable {
         return true;
     }
 
-    function tokenFromReflection(uint256 rAmount)
-        private
-        view
-        returns (uint256)
-    {
-        require(
-            rAmount <= _rTotal,
-            "Amount must be less than total reflections"
-        );
-        uint256 currentRate = _getRate();
-        return rAmount.div(currentRate);
-    }
+   
 
     function removeAllFee() private {
         if (_redisFee == 0 && _taxFee == 0) return;
@@ -696,17 +715,9 @@ contract Singularity is Context, IERC20, Ownable {
         return (rAmount, rTransferAmount, rFee);
     }
 
-    function _getRate() private view returns (uint256) {
-        (uint256 rSupply, uint256 tSupply) = _getCurrentSupply();
-        return rSupply.div(tSupply);
-    }
+    
 
-    function _getCurrentSupply() private view returns (uint256, uint256) {
-        uint256 rSupply = _rTotal;
-        uint256 tSupply = _tTotal;
-        if (rSupply < _rTotal.div(_tTotal)) return (_rTotal, _tTotal);
-        return (rSupply, tSupply);
-    }
+    
 
     function setBuyAndSellFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) public onlyOwner {
         _redisFeeOnBuy = redisFeeOnBuy;
