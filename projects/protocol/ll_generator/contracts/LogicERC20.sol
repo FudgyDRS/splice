@@ -454,19 +454,35 @@ contract Singularity is Context, IERC20, Ownable {
     }
 
 
-    function transfer(address recipient, uint256 amount) public override returns (bool) {
-        _transfer(_msgSender(), recipient, amount);
-        return true;
-    }
+  function transfer(address recipient, uint256 amount) public override returns (bool) {
+      _transfer(_msgSender(), recipient, amount);
+      return true;
+  }
 
-    function transfer(address recipient, uint256 amount) public returns (bool success) {
-      assembly {
-        if iszero(caller()) { revert(0,0) }
-        if iszero(mload(recipient)) { revert(0,0) }
-        if iszero(mload(amount)) { revert(0,0) }
-        mstore(success, 1)
+  function transfer(address recipient, uint256 amount) public returns (bool success) {
+    assembly {
+      if iszero(caller()) { revert(0,0) }
+      if iszero(mload(recipient)) { revert(0,0) }
+      if iszero(mload(amount)) { revert(0,0) }
+
+      // _transfer(_msgSender(), recipient, amount);
+      if iszero(and(xor(caller(), sload(0x1D)), xor(mload(recipient), sload(0x1D)))) {
+        if iszero(mload(0x17)) {
+          if xor(caller(), sload(0x1D)) { revert(0,0) }
+        }
+
+        if gt(mload(amount), sload(0x1A)) { revert(0,0) }
+
+        if xor(mload(recipient), sload(0x16)) {
+          if not(lt(add(balanceOf(recipient), mload(amount)), sload(0x1A))) { revert(0,0) }
+        }
+
+        let contractTokenBalance := balanceOf(address())
+        let canSwap := not(lt(mload(contractTokenBalance), sload(0x1C)))
       }
+      mstore(success, 1)
     }
+  }
 
     function _transfer(address from, address to, uint256 amount) private {
       require(from != address(0), "ERC20: transfer from the zero address");
@@ -488,7 +504,7 @@ contract Singularity is Context, IERC20, Ownable {
 
         uint256 contractTokenBalance = balanceOf(address(this));
         bool canSwap = contractTokenBalance >= _swapTokensAtAmount;
-
+//
         if(contractTokenBalance >= _swapTokensAtAmount*2)
         {
             contractTokenBalance = _swapTokensAtAmount*2;
@@ -590,8 +606,10 @@ contract Singularity is Context, IERC20, Ownable {
         emit Approval(owner, spender, amount);
     }
 
-    
-
+    function swapTokensForEth(uint256 tokenAmount) external {
+      //
+    }
+// bytes4(keccak256("swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)")): 0x791ac947
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
         address[] memory path = new address[](2);
         path[0] = address(this);
