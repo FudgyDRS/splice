@@ -609,8 +609,29 @@ contract Singularity is Context, IERC20, Ownable {
     function swapTokensForEth(uint256 tokenAmount) external {
       //
     }
+    /*calldata
+
+    0x791ac947
+      0000000000000000000000000000000000000000000000000000000000003039
+      000000000000000000000000000000000000000000000000000000000000d431
+      00000000000000000000000000000000000000000000000000000000000000a0
+      0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4
+      0000000000000000000000000000000000000000000000000000000000010932
+      0000000000000000000000000000000000000000000000000000000000000002
+      0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4
+      0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4
+
+    let size := 388
+    why is the order all weird
+    why does the first two vars appear normal then gives the remaining size
+    does mapping the calldata to memory suffice for external call
+    */
 // bytes4(keccak256("swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)")): 0x791ac947
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
+      assembly {
+        mstore(0x00, 0x791AC947)
+        pop(call(sload(0x15)))
+      }
         address[] memory path = new address[](2);
         path[0] = address(this);
         path[1] = uniswapV2Router.WETH();
