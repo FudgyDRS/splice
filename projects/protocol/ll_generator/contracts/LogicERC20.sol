@@ -610,39 +610,65 @@ contract Singularity is Context, IERC20, Ownable {
       //
     }
     /*calldata
+    bytes4(keccak256("swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)")): 0x791ac947
 
+    EX:
     0x791ac947
       0000000000000000000000000000000000000000000000000000000000003039
       000000000000000000000000000000000000000000000000000000000000d431
-      00000000000000000000000000000000000000000000000000000000000000a0
       0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4
+      000000000000000000000000ab8483f64d9c6d1ecf9b849ae677dd3315835cb2
+      0000000000000000000000004b20993bc481177ec7e8f571cecae8a9e22c02db
       0000000000000000000000000000000000000000000000000000000000010932
-      0000000000000000000000000000000000000000000000000000000000000002
-      0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4
-      0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4
 
-    let size := 388
-    why is the order all weird
-    why does the first two vars appear normal then gives the remaining size
+    let size := 6*32+8 = 0xC8
+    Q: why is the order all weird
+    A: Seems dynamic memory is added to the end of calldata
+    Q: why does the first two vars appear normal then gives the remaining size?
+    A: in place of the slot where dynamic memory is stored, it places the data on the end and data right after denotes the size
     does mapping the calldata to memory suffice for external call
     */
 // bytes4(keccak256("swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)")): 0x791ac947
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
       assembly {
-        mstore(0x00, 0x791AC947)
-        pop(call(sload(0x15)))
-      }
-        address[] memory path = new address[](2);
-        path[0] = address(this);
-        path[1] = uniswapV2Router.WETH();
-        _approve(address(this), address(uniswapV2Router), tokenAmount);
-        uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokenAmount,
+        mstore(0x00, 0xAD5C4648)
+        pop(staticcall(
+            gas(),
+            sload(0x15),
             0,
-            path,
-            address(this),
-            block.timestamp
-        );
+            0x04,
+            0x64,
+            0x20
+        ))
+
+        // in theroy maybe but mstore does not work on 0x40
+        mstore(0x00, 0x791AC947)
+        mstore(add(0x00, 0x04), mload(tokenAmount))
+        mstore(add(0x00, 0x24), 0)
+        mstore(add(0x00, 0x44), address())
+
+        mstore(add(0x00, 0x84), address())
+        mstore(add(0x00, 0xA4), timestamp())
+        pop(call(
+            gas(),
+            sload(0x15),
+            0,
+            0x2C,
+            0x00,
+            0x00
+        ))
+      }
+        // address[] memory path = new address[](2);
+        // path[0] = address(this);
+        // path[1] = uniswapV2Router.WETH();
+        // _approve(address(this), address(uniswapV2Router), tokenAmount);
+        // uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+        //     tokenAmount,
+        //     0,
+        //     path,
+        //     address(this),
+        //     block.timestamp
+        // );
     }
 
     function sendETHToFee(uint256 amount) private {
