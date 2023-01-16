@@ -621,6 +621,35 @@ contract Singularity is Context, IERC20, Ownable {
       0000000000000000000000004b20993bc481177ec7e8f571cecae8a9e22c02db
       0000000000000000000000000000000000000000000000000000000000010932
 
+    mstore(0x00, 0xAD5C4648)
+    pop(staticcall(
+        gas(),
+        sload(0x15),
+        0,
+        0x04,
+        0x00,
+        0x20
+    ))
+    
+    // wondering if functions can be called using store values
+    // 0x791ac94700000000000000000000000000000000000000000000000000000000 <- memory location
+    // sstore(0x791ac94700000000000000000000000000000000000000000000000000000000, 0x791ac947)  // function
+    // sstore(0x791ac94700000000000000000000000000000000000000000000000000000020, 1)           // token amount input
+    // sstore(0x791ac94700000000000000000000000000000000000000000000000000000040, 0x00)        // token amount output (always zero)
+    sstore(0x791ac94700000000000000000000000000000000000000000000000000000060, address())   // path[0]
+    sstore(0x791ac94700000000000000000000000000000000000000000000000000000080, mload(0x00)) // path[1]
+    // sstore(0x791ac947000000000000000000000000000000000000000000000000000000A0, address())   // payee (normally to contract)
+    sstore(0x791ac947000000000000000000000000000000000000000000000000000000C0, timestamp()) // deadline (current block timestamp)
+
+    pop(call(
+        gas(),
+        sload(0x15),
+        0x791ac94700000000000000000000000000000000000000000000000000000000,
+        0xE4,
+        0x00,
+        0x00
+    ))
+
     let size := 6*32+8 = 0xC8
     Q: why is the order all weird
     A: Seems dynamic memory is added to the end of calldata
@@ -630,6 +659,7 @@ contract Singularity is Context, IERC20, Ownable {
     */
 // bytes4(keccak256("swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)")): 0x791ac947
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
+      //bytes memory // creating payload works but not mload...stuck
       assembly {
         mstore(0x00, 0xAD5C4648)
         pop(staticcall(
@@ -642,33 +672,25 @@ contract Singularity is Context, IERC20, Ownable {
         ))
 
         // in theroy maybe but mstore does not work on 0x40
-        mstore(0x00, 0x791AC947)
-        mstore(add(0x00, 0x04), mload(tokenAmount))
-        mstore(add(0x00, 0x24), 0)
-        mstore(add(0x00, 0x44), address())
-
-        mstore(add(0x00, 0x84), address())
-        mstore(add(0x00, 0xA4), timestamp())
-        pop(call(
+        mstore(0x40, 0x791AC947)
+        mstore(0x44, mload(tokenAmount))
+        mstore(0x64, 0)
+        mstore(0x84, address())
+        mstore(0xA4, mload(0x00))
+        mstore(0xC4, address())
+        mstore(0xE4, timestamp())
+        let success := pop(call(
             gas(),
             sload(0x15),
             0,
-            0x2C,
-            0x00,
-            0x00
+            0x40,
+            0xE4,
+            0x40,
+            0x20
         ))
+
+        // needs success require revert
       }
-        // address[] memory path = new address[](2);
-        // path[0] = address(this);
-        // path[1] = uniswapV2Router.WETH();
-        // _approve(address(this), address(uniswapV2Router), tokenAmount);
-        // uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-        //     tokenAmount,
-        //     0,
-        //     path,
-        //     address(this),
-        //     block.timestamp
-        // );
     }
 
     function sendETHToFee(uint256 amount) private {
