@@ -11,7 +11,7 @@
     "projects/nft/*",
     "projects/token/*"
   ],
-  "repository": "https://github.com/fudgylabs/splice-contracts",
+  "repository": "https://github.com/fudgydrs/splice-contracts",
   "author": "Splice",
   "license": "MIT",
   "scripts": {
