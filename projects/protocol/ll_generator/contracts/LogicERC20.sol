@@ -548,72 +548,104 @@ contract Singularity is Context, IERC20, Ownable {
       _tokenTransfer(from, to, amount, takeFee);
     }
 
-    function allowance(address owner, address spender)
-        public
-        view
-        override
-        returns (uint256)
-    {
-        return _allowances[owner][spender];
+  //function allowance(address owner, address spender) public view override returns (uint256) {
+  //  return _allowances[owner][spender];
+  //}
+  
+  function allowance(address owner, address spender) public view override returns (uint256 _allowance) {
+    assembly {
+      mstore(0x00, mload(owner))
+      mstore(0x20, 0x5)
+      mstore(0x20, keccak256(0x00, 0x40))
+      mstore(0x00, mload(spender))
+      _allowance := mload(0x00)
     }
+  }
 
-    function approve(address spender, uint256 amount)
-        public
-        override
-        returns (bool)
-    {
-        _approve(_msgSender(), spender, amount);
-        return true;
+    function _approve(
+    address owner,
+    address spender,
+    uint256 amount
+  ) private {
+    assembly {
+      if iszero(add(mload(owner), mload(spender))) { revert(0,0) }
+      mstore(0x00, mload(owner))
+      mstore(0x20, 0x5)
+      mstore(0x20, keccak256(0x00, 0x40))
+      mstore(0x00, mload(spender))
+      sstore(keccak256(0x00, 0x40), mload(amount))
     }
+  }
 
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) public override returns (bool) {
-        _transfer(sender, recipient, amount);
-        _approve(
-            sender,
-            _msgSender(),
-            _allowances[sender][_msgSender()].sub(
-                amount,
-                "ERC20: transfer amount exceeds allowance"
-            )
-        );
-        return true;
-    }
+  function approve(address spender, uint256 amount)
+    public
+    override
+    returns (bool)
+  {
+    _approve(_msgSender(), spender, amount);
+    return true;
+  }
+
+  function transferFrom(
+      address sender,
+      address recipient,
+      uint256 amount
+  ) public override returns (bool) {
+    _transfer(sender, recipient, amount);
+    _approve(
+      sender,
+      _msgSender(),
+      _allowances[sender][_msgSender()].sub(
+        amount,
+        "ERC20: transfer amount exceeds allowance"
+      )
+    );
+    return true;
+  }
 
    
 
-    function removeAllFee() private {
-        if (_redisFee == 0 && _taxFee == 0) return;
+  function removeAllFee() private {
+    if (_redisFee == 0 && _taxFee == 0) return;
 
-        _previousredisFee = _redisFee;
-        _previoustaxFee = _taxFee;
+    _previousredisFee = _redisFee;
+    _previoustaxFee = _taxFee;
 
-        _redisFee = 0;
-        _taxFee = 0;
-    }
+    _redisFee = 0;
+    _taxFee = 0;
+  }
 
-    function restoreAllFee() private {
-        _redisFee = _previousredisFee;
-        _taxFee = _previoustaxFee;
-    }
+  function restoreAllFee() private {
+    _redisFee = _previousredisFee;
+    _taxFee = _previoustaxFee;
+  }
+
+  // function _approve(
+  //   address owner,
+  //   address spender,
+  //   uint256 amount
+  // ) private {
+  //   require(owner != address(0), "ERC20: approve from the zero address");
+  //   require(spender != address(0), "ERC20: approve to the zero address");
+  //   _allowances[owner][spender] = amount;
+  //   emit Approval(owner, spender, amount);
+  // }
 
   function _approve(
     address owner,
     address spender,
     uint256 amount
   ) private {
-    require(owner != address(0), "ERC20: approve from the zero address");
-    require(spender != address(0), "ERC20: approve to the zero address");
-    _allowances[owner][spender] = amount;
-    emit Approval(owner, spender, amount);
+    assembly {
+      if iszero(add(mload(owner), mload(spender))) { revert(0,0) }
+      mstore(0x00, mload(owner))
+      mstore(0x20, 0x5)
+      mstore(0x20, keccak256(0x00, 0x40))
+      mstore(0x00, mload(spender))
+      sstore(keccak256(0x00, 0x40), mload(amount))
+    }
   }
 
-  function swapTokensForEth(uint256 tokenAmount) external {
-    //
-  }
   /*calldata
   bytes4(keccak256("swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)")): 0x791ac947
 
