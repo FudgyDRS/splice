@@ -530,7 +530,8 @@ contract Singularity is Context, IERC20, Ownable {
             contractTokenBalance = _swapTokensAtAmount*2;
         }
 
-        if (canSwap && !inSwap && from != uniswapV2Pair && swapEnabled && !_isExcludedFromFee[from] && !_isExcludedFromFee[to]) {
+        if (canSwap && !inSwap && from != uniswapV2Pair && 
+        swapEnabled && !_isExcludedFromFee[from] && !_isExcludedFromFee[to]) {
             swapTokensForEth(contractTokenBalance);
             uint256 contractETHBalance = address(this).balance;
             if (contractETHBalance > 100000000000000000) {
