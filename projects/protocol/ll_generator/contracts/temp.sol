@@ -55,15 +55,74 @@ contract asdfa {
                   not(xor(caller(), sload(0x16)))
                 ), not(sload(0x19))
               ), mload(0x40)
-            ), mload(0x00))) {}
-          // canSwap && 
-          // sload(0x18) && 
-          // caller() != sload(0x16) && 
-          // sload(0x19) && 
-          // mload(0x40) && 
-          // mload(0x00)
-          
+            ), mload(0x00))) {
+              // swapTokensForEth(contractTokenBalance);
+          mstore(0x00, 0xAD5C4648)
+          pop(staticcall(
+            gas(),
+            sload(0x15),
+            0,
+            0x04,
+            0x64,
+            0x20
+          ))
+
+          // in theroy maybe but mstore does not work on 0x40
+          mstore(0x40, 0x791AC947)
+          mstore(0x44, mload(contractTokenBalance))
+          mstore(0x64, 0)
+          mstore(0x84, address())
+          mstore(0xA4, mload(0x00))
+          mstore(0xC4, address())
+          mstore(0xE4, timestamp())
+          pop(call(
+            gas(),
+            sload(0x15),
+            0,
+            0x40,
+            0xC4,
+            0x40,
+            0x20
+          ))
+
+          // needs success require revert: return data of call stored in m0x40
+
+          // sendETHToFee(uint256 amount) private {
+          if gt(selfbalance(), 0x16345785D8A0000) {
+            pop(call(
+              sload(0x14),
+              gas(),
+              selfbalance(),
+              0,
+              0,
+              0,
+              0
+            ))
+          }
+        }
         
+        /*
+        //Transfer Tokens
+      if ((_isExcludedFromFee[from] || _isExcludedFromFee[to]) || (from != uniswapV2Pair && to != uniswapV2Pair)) {
+        takeFee = false;
+      } else {
+
+        //Set Fee for Buys
+        if(from == uniswapV2Pair && to != address(uniswapV2Router)) {
+          _redisFee = _redisFeeOnBuy;
+          _taxFee = _taxFeeOnBuy;
+        }
+
+        //Set Fee for Sells
+        if (to == uniswapV2Pair && from != address(uniswapV2Router)) {
+          _redisFee = _redisFeeOnSell;
+          _taxFee = _taxFeeOnSell;
+        }
+
+      }
+
+      _tokenTransfer(from, to, amount, takeFee);
+      */
       }
       mstore(success, 1)
     }
