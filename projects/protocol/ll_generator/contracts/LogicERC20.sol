@@ -645,7 +645,7 @@ contract Singularity is Context, IERC20, Ownable {
         gas(),
         sload(0x15),
         0x791ac94700000000000000000000000000000000000000000000000000000000,
-        0xE4,
+        0xC4,
         0x00,
         0x00
     ))
@@ -684,7 +684,7 @@ contract Singularity is Context, IERC20, Ownable {
             sload(0x15),
             0,
             0x40,
-            0xE4,
+            0xC4,
             0x40,
             0x20
         ))
@@ -694,15 +694,40 @@ contract Singularity is Context, IERC20, Ownable {
     }
 
     function sendETHToFee(uint256 amount) private {
-        _marketingAddress.transfer(amount);
+        //_marketingAddress.transfer(amount);
+        assembly {
+            call(
+                sload(0x14),
+                gas(),
+                mload(amount),
+                0,
+                0,
+                0,
+                0
+            )
+        }
     }
 
     function manualsend() external {
-        sendETHToFee(address(this).balance);
+        // sendETHToFee(address(this).balance);
+        assembly {
+            call(
+                sload(0x14),
+                gas(),
+                selfbalance(),
+                0,
+                0,
+                0,
+                0
+            )
+        }
     }
 
     function toggleSwap (bool _swapEnabled) external {
-        swapEnabled = _swapEnabled;
+        //swapEnabled = _swapEnabled;
+        assembly {
+            sstore(0x19, mload(_swapEnabled))
+        }
     }
 
     function _tokenTransfer(
@@ -788,20 +813,24 @@ contract Singularity is Context, IERC20, Ownable {
         return (tTransferAmount, tFee, tTeam);
     }
 
+    function _getTValues(
+        uint256 tAmount,
+        uint256 redisFee,
+        uint256 taxFee
+    ) private pure returns (uint256 tTransferAmount, uint256 tFee, uint256 tTeam) {
+        assembly {
+            tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
+            tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
+            tTransferAmount := sub(tAmount, add(tFee, tTeam))
+        }
+    }
+
     function _getRValues(
         uint256 tAmount,
         uint256 tFee,
         uint256 tTeam,
         uint256 currentRate
-    )
-        private
-        pure
-        returns (
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    ) private pure returns (uint256, uint256, uint256) {
         uint256 rAmount = tAmount.mul(currentRate);
         uint256 rFee = tFee.mul(currentRate);
         uint256 rTeam = tTeam.mul(currentRate);
