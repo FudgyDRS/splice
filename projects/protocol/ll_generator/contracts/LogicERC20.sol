@@ -602,22 +602,35 @@ contract Singularity is Context, IERC20, Ownable {
     );
     return true;
   }
-
-   
+  
+  // function removeAllFee() private {
+  //   if (_redisFee == 0 && _taxFee == 0) return;
+  //   _previousredisFee = _redisFee;
+  //   _previoustaxFee = _taxFee;
+  //   _redisFee = 0;
+  //   _taxFee = 0;
+  // }
 
   function removeAllFee() private {
-    if (_redisFee == 0 && _taxFee == 0) return;
-
-    _previousredisFee = _redisFee;
-    _previoustaxFee = _taxFee;
-
-    _redisFee = 0;
-    _taxFee = 0;
+    assembly {
+      if iszero(and(sload(0x11), sload(0x12))) { return(0) }
+      sstore(0x11, sload(0x0F))
+      sstore(0x12, sload(0x10))
+      sstore(0x0F, 0)
+      sstore(0x10, 0)
+    }
   }
 
+  // function restoreAllFee() private {
+  //   _redisFee = _previousredisFee;
+  //   _taxFee = _previoustaxFee;
+  // }
+
   function restoreAllFee() private {
-    _redisFee = _previousredisFee;
-    _taxFee = _previoustaxFee;
+    assembly {
+      sstore(0x0F, sload(0x11))
+      sstore(0x10, sload(0x12))
+    }
   }
 
   // function _approve(
@@ -887,13 +900,13 @@ contract Singularity is Context, IERC20, Ownable {
 
     
 
-  function setBuyAndSellFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) public onlyOwner {
-    _redisFeeOnBuy = redisFeeOnBuy;
-    _redisFeeOnSell = redisFeeOnSell;
-    _taxFeeOnBuy = taxFeeOnBuy;
-    _taxFeeOnSell = taxFeeOnSell;
-    require (_redisFeeOnBuy+_redisFeeOnSell+_taxFeeOnBuy+_taxFeeOnSell <= 25);
-  }
+  // function setBuyAndSellFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) public onlyOwner {
+  //   _redisFeeOnBuy = redisFeeOnBuy;
+  //   _redisFeeOnSell = redisFeeOnSell;
+  //   _taxFeeOnBuy = taxFeeOnBuy;
+  //   _taxFeeOnSell = taxFeeOnSell;
+  //   require (_redisFeeOnBuy+_redisFeeOnSell+_taxFeeOnBuy+_taxFeeOnSell <= 25);
+  // }
 
   function setBuyAndSellFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) public onlyOwner {
     assembly {
