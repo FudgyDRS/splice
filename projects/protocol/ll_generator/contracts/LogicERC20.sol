@@ -834,25 +834,45 @@ contract Singularity is Context, IERC20, Ownable {
 
     receive() external payable {}
 
-    function _getValues(uint256 tAmount)
-        private
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
-        (uint256 tTransferAmount, uint256 tFee, uint256 tTeam) =
-            _getTValues(tAmount, _redisFee, _taxFee);
-        uint256 currentRate = _getRate();
-        (uint256 rAmount, uint256 rTransferAmount, uint256 rFee) =
-            _getRValues(tAmount, tFee, tTeam, currentRate);
-        return (rAmount, rTransferAmount, rFee, tTransferAmount, tFee, tTeam);
+  // function _getValues(uint256 tAmount) private view returns (
+  //   uint256,
+  //   uint256,
+  //   uint256,
+  //   uint256,
+  //   uint256,
+  //   uint256
+  // ) {
+  //   (uint256 tTransferAmount, uint256 tFee, uint256 tTeam) =
+  //     _getTValues(tAmount, _redisFee, _taxFee);
+  //   uint256 currentRate = _getRate();
+  //   (uint256 rAmount, uint256 rTransferAmount, uint256 rFee) =
+  //     _getRValues(tAmount, tFee, tTeam, currentRate);
+  //   return (rAmount, rTransferAmount, rFee, tTransferAmount, tFee, tTeam);
+  // }
+
+  function _getValues(uint256 tAmount) private view returns (
+    uint256 rAmount,
+    uint256 rTransferAmount,
+    uint256 rFee,
+    uint256 tTransferAmount,
+    uint256 tFee,
+    uint256 tTeam
+  ) {
+    assembly {
+      tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
+      tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
+      tTransferAmount := sub(tAmount, add(tFee, tTeam))
+      let currentRate     := div(sload(0x09), sload(0x08))
+      rAmount := mul(mload(tAmount), mload(currentRate))
+      rFee := mul(mload(tFee), mload(currentRate))
+      rTransferAmount := sub(
+        rAmount, 
+        add(
+          mload(rFee), 
+          mul(mload(tTeam), mload(currentRate)))
+      )
     }
+  }
 
   // function _getTValues(
   //   uint256 tAmount,
@@ -903,7 +923,7 @@ contract Singularity is Context, IERC20, Ownable {
         rAmount, 
         add(
           mload(rFee), 
-          mul(mload(tTeam, mload(currentRate))))
+          mul(mload(tTeam), mload(currentRate)))
       )
     }
   }
