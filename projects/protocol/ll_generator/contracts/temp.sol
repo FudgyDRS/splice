@@ -68,6 +68,7 @@ contract asdfa {
           ))
 
           // in theroy maybe but mstore does not work on 0x40
+          // swapTokensForEth(contractTokenBalance);
           mstore(0x40, 0x791AC947)
           mstore(0x44, mload(contractTokenBalance))
           mstore(0x64, 0)
@@ -87,7 +88,7 @@ contract asdfa {
 
           // needs success require revert: return data of call stored in m0x40
 
-          // sendETHToFee(uint256 amount) private {
+          // sendETHToFee(contractETHBalance);
           if gt(selfbalance(), 0x16345785D8A0000) {
             pop(call(
               sload(0x14),
