@@ -813,10 +813,22 @@ contract Singularity is Context, IERC20, Ownable {
     emit Transfer(sender, recipient, tTransferAmount);
   }
 
+  // DEFAULT
+  // function _takeTeam(uint256 tTeam) private {
+  //   uint256 currentRate = _getRate();
+  //   uint256 rTeam = tTeam.mul(currentRate);
+  //   _rOwned[address(this)] = _rOwned[address(this)].add(rTeam);
+  // }
+
+  // INLINE ASSEMBLY
   function _takeTeam(uint256 tTeam) private {
-    uint256 currentRate = _getRate();
-    uint256 rTeam = tTeam.mul(currentRate);
-    _rOwned[address(this)] = _rOwned[address(this)].add(rTeam);
+    assembly {
+      let rTeam := mul(mload(tTeam), div(sload(0x09), sload(0x08)))
+      mstore(0x00, address())
+      mstore(0x20, 0x03)
+      let _rOwned := keccak256(0x00, 0x20)
+      sstore(_rOwned, add(sload(_rOwned), mload(rTeam)))
+    }
   }
 
   // DEFAULT
