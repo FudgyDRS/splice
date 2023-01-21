@@ -605,6 +605,7 @@ contract Singularity is Context, IERC20, Ownable {
     return true;
   }
 
+  // DEFAULT
   // function removeAllFee() private {
   //   if (_redisFee == 0 && _taxFee == 0) return;
   //   _previousredisFee = _redisFee;
@@ -613,27 +614,30 @@ contract Singularity is Context, IERC20, Ownable {
   //   _taxFee = 0;
   // }
 
-  function removeAllFee() private {
-    assembly {
-      if iszero(and(sload(0x11), sload(0x12))) { return(0) }
-      sstore(0x11, sload(0x0F))
-      sstore(0x12, sload(0x10))
-      sstore(0x0F, 0)
-      sstore(0x10, 0)
-    }
-  }
+  // INLINE ASSEMBLY: not used
+  // function removeAllFee() private {
+  //   assembly {
+  //     if iszero(and(sload(0x11), sload(0x12))) { return(0) }
+  //     sstore(0x11, sload(0x0F))
+  //     sstore(0x12, sload(0x10))
+  //     sstore(0x0F, 0)
+  //     sstore(0x10, 0)
+  //   }
+  // }
 
+  // DEFAULT
   // function restoreAllFee() private {
   //   _redisFee = _previousredisFee;
   //   _taxFee = _previoustaxFee;
   // }
 
-  function restoreAllFee() private {
-    assembly {
-      sstore(0x0F, sload(0x11))
-      sstore(0x10, sload(0x12))
-    }
-  }
+  // INLINE ASSEMBLY: not used
+  // function restoreAllFee() private {
+  //   assembly {
+  //     sstore(0x0F, sload(0x11))
+  //     sstore(0x10, sload(0x12))
+  //   }
+  // }
 
   // function _approve(
   //   address owner,
@@ -782,35 +786,148 @@ contract Singularity is Context, IERC20, Ownable {
     }
   }
 
-  function _tokenTransfer(
-    address sender,
-    address recipient,
-    uint256 amount,
-    bool takeFee
-  ) private {
-    if (!takeFee) removeAllFee();
-    _transferStandard(sender, recipient, amount);
-    if (!takeFee) restoreAllFee();
-  }
+  // DEFAULT
+  // function _tokenTransfer(
+  //   address sender,
+  //   address recipient,
+  //   uint256 amount,
+  //   bool takeFee
+  // ) private {
+  //   if (!takeFee) removeAllFee();
+  //   _transferStandard(sender, recipient, amount);
+  //   if (!takeFee) restoreAllFee();
+  // }
 
+  // INLINE ASSEMBLY: not used
+  // function _tokenTransfer(
+  //   address sender,
+  //   address recipient,
+  //   uint256 amount,
+  //   bool takeFee
+  // ) private {
+  //   assembly {
+  //     // if (!takeFee) removeAllFee();
+  //     if iszero(mload(takeFee)) {
+  //       if iszero(and(sload(0x11), sload(0x12))) { return(0) }
+  //       sstore(0x11, sload(0x0F))
+  //       sstore(0x12, sload(0x10))
+  //       sstore(0x0F, 0)
+  //       sstore(0x10, 0)
+  //     }
+  //
+  //     // _transferStandard(sender, recipient, amount);
+  //     let tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
+  //     let tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
+  //     let tTransferAmount := sub(tAmount, add(tFee, tTeam))
+  //     let currentRate     := div(sload(0x09), sload(0x08))
+  //     let rAmount := mul(mload(tAmount), mload(currentRate))
+  //     let rFee := mul(mload(tFee), mload(currentRate))
+  //     let rTransferAmount := sub(
+  //       rAmount, 
+  //       add(
+  //         mload(rFee), 
+  //         mul(mload(tTeam), mload(currentRate)))
+  //     )
+  //
+  //     // _rOwned[sender] = _rOwned[sender].sub(rAmount);
+  //     mstore(0x00, mload(sender))
+  //     mstore(0x20, 0x03)
+  //     let _rOwned := keccak256(0x00, 0x20)
+  //     sstore(_rOwned, sub(sload(_rOwned), mload(rAmount)))
+  //
+  //     // _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+  //     mstore(0x00, mload(recipient))
+  //     let _rOwned := keccak256(0x00, 0x20)
+  //     sstore(_rOwned, add(sload(_rOwned), mload(rTransferAmount)))
+  //
+  //     // _takeTeam(tTeam);
+  //     let rTeam := mul(mload(tTeam), div(sload(0x09), sload(0x08)))
+  //     mstore(0x00, address())
+  //     mstore(0x20, 0x03)
+  //     let _rOwned := keccak256(0x00, 0x20)
+  //     sstore(_rOwned, add(sload(_rOwned), mload(rTeam)))
+  //
+  //     // _reflectFee(rFee, tFee);
+  //     sstore(0x09, sub(sload(0x09), mload(rFee)))
+  //     sstore(0x0A, add(sload(0x0A), mload(tFee)))
+  //
+  //     // if (!takeFee) restoreAllFee();
+  //     if iszero(mload(takeFee)) {
+  //       sstore(0x0F, sload(0x11))
+  //       sstore(0x10, sload(0x12))
+  //     }
+  //
+  //
+  //   }
+  //   if (!takeFee) removeAllFee();
+  //   _transferStandard(sender, recipient, amount);
+  //   if (!takeFee) restoreAllFee();
+  // }
+
+  // DEFAULT
+  // function _transferStandard(
+  //   address sender,
+  //   address recipient,
+  //   uint256 tAmount
+  // ) private {
+  //   (
+  //     uint256 rAmount,
+  //     uint256 rTransferAmount,
+  //     uint256 rFee,
+  //     uint256 tTransferAmount,
+  //     uint256 tFee,
+  //     uint256 tTeam
+  //   ) = _getValues(tAmount);
+  //   _rOwned[sender] = _rOwned[sender].sub(rAmount);
+  //   _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+  //   _takeTeam(tTeam);
+  //   _reflectFee(rFee, tFee);
+  //   emit Transfer(sender, recipient, tTransferAmount);
+  // }
+
+  // INLINE ASSEMBLY
   function _transferStandard(
     address sender,
     address recipient,
     uint256 tAmount
   ) private {
-    (
-      uint256 rAmount,
-      uint256 rTransferAmount,
-      uint256 rFee,
-      uint256 tTransferAmount,
-      uint256 tFee,
-      uint256 tTeam
-    ) = _getValues(tAmount);
-    _rOwned[sender] = _rOwned[sender].sub(rAmount);
-    _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
-    _takeTeam(tTeam);
-    _reflectFee(rFee, tFee);
-    emit Transfer(sender, recipient, tTransferAmount);
+    assembly {
+      let tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
+      let tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
+      let tTransferAmount := sub(tAmount, add(tFee, tTeam))
+      let currentRate     := div(sload(0x09), sload(0x08))
+      let rAmount := mul(mload(tAmount), mload(currentRate))
+      let rFee := mul(mload(tFee), mload(currentRate))
+      let rTransferAmount := sub(
+        rAmount, 
+        add(
+          mload(rFee), 
+          mul(mload(tTeam), mload(currentRate)))
+      )
+
+      // _rOwned[sender] = _rOwned[sender].sub(rAmount);
+      mstore(0x00, mload(sender))
+      mstore(0x20, 0x03)
+      let _rOwned := keccak256(0x00, 0x20)
+      sstore(_rOwned, sub(sload(_rOwned), mload(rAmount)))
+
+      // _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+      mstore(0x00, mload(recipient))
+      let _rOwned := keccak256(0x00, 0x20)
+      sstore(_rOwned, add(sload(_rOwned), mload(rTransferAmount)))
+
+      // _takeTeam(tTeam);
+      let rTeam := mul(mload(tTeam), div(sload(0x09), sload(0x08)))
+      mstore(0x00, address())
+      mstore(0x20, 0x03)
+      let _rOwned := keccak256(0x00, 0x20)
+      sstore(_rOwned, add(sload(_rOwned), mload(rTeam)))
+
+      // _reflectFee(rFee, tFee);
+      sstore(0x09, sub(sload(0x09), mload(rFee)))
+      sstore(0x0A, add(sload(0x0A), mload(tFee)))
+    }
+    //emit Transfer(sender, recipient, tTransferAmount);
   }
 
   // DEFAULT
@@ -820,16 +937,16 @@ contract Singularity is Context, IERC20, Ownable {
   //   _rOwned[address(this)] = _rOwned[address(this)].add(rTeam);
   // }
 
-  // INLINE ASSEMBLY
-  function _takeTeam(uint256 tTeam) private {
-    assembly {
-      let rTeam := mul(mload(tTeam), div(sload(0x09), sload(0x08)))
-      mstore(0x00, address())
-      mstore(0x20, 0x03)
-      let _rOwned := keccak256(0x00, 0x20)
-      sstore(_rOwned, add(sload(_rOwned), mload(rTeam)))
-    }
-  }
+  // INLINE ASSEMBLY: not unused
+  // function _takeTeam(uint256 tTeam) private {
+  //   assembly {
+  //     let rTeam := mul(mload(tTeam), div(sload(0x09), sload(0x08)))
+  //     mstore(0x00, address())
+  //     mstore(0x20, 0x03)
+  //     let _rOwned := keccak256(0x00, 0x20)
+  //     sstore(_rOwned, add(sload(_rOwned), mload(rTeam)))
+  //   }
+  // }
 
   // DEFAULT
   // function _reflectFee(uint256 rFee, uint256 tFee) private {
@@ -837,16 +954,17 @@ contract Singularity is Context, IERC20, Ownable {
   //   _tFeeTotal = _tFeeTotal.add(tFee);
   // }
 
-  // INLINE ASSEMBLY
-  function _reflectFee(uint256 rFee, uint256 tFee) private {
-    assembly {
-      sstore(0x09, sub(sload(0x09), mload(rFee)))
-      sstore(0x0A, add(sload(0x0A), mload(tFee)))
-    }
-  }
+  // INLINE ASSEMBLY: not unused
+  // function _reflectFee(uint256 rFee, uint256 tFee) private {
+  //   assembly {
+  //     sstore(0x09, sub(sload(0x09), mload(rFee)))
+  //     sstore(0x0A, add(sload(0x0A), mload(tFee)))
+  //   }
+  // }
 
   receive() external payable {}
 
+  // DEFAULT
   // function _getValues(uint256 tAmount) private view returns (
   //   uint256,
   //   uint256,
@@ -863,29 +981,30 @@ contract Singularity is Context, IERC20, Ownable {
   //   return (rAmount, rTransferAmount, rFee, tTransferAmount, tFee, tTeam);
   // }
 
-  function _getValues(uint256 tAmount) private view returns (
-    uint256 rAmount,
-    uint256 rTransferAmount,
-    uint256 rFee,
-    uint256 tTransferAmount,
-    uint256 tFee,
-    uint256 tTeam
-  ) {
-    assembly {
-      tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
-      tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
-      tTransferAmount := sub(tAmount, add(tFee, tTeam))
-      let currentRate     := div(sload(0x09), sload(0x08))
-      rAmount := mul(mload(tAmount), mload(currentRate))
-      rFee := mul(mload(tFee), mload(currentRate))
-      rTransferAmount := sub(
-        rAmount, 
-        add(
-          mload(rFee), 
-          mul(mload(tTeam), mload(currentRate)))
-      )
-    }
-  }
+  // INLINE ASSEMBLY: not unused
+  // function _getValues(uint256 tAmount) private view returns (
+  //   uint256 rAmount,
+  //   uint256 rTransferAmount,
+  //   uint256 rFee,
+  //   uint256 tTransferAmount,
+  //   uint256 tFee,
+  //   uint256 tTeam
+  // ) {
+  //   assembly {
+  //     tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
+  //     tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
+  //     tTransferAmount := sub(tAmount, add(tFee, tTeam))
+  //     let currentRate     := div(sload(0x09), sload(0x08))
+  //     rAmount := mul(mload(tAmount), mload(currentRate))
+  //     rFee := mul(mload(tFee), mload(currentRate))
+  //     rTransferAmount := sub(
+  //       rAmount, 
+  //       add(
+  //         mload(rFee), 
+  //         mul(mload(tTeam), mload(currentRate)))
+  //     )
+  //   }
+  // }
 
   // DEFAULT
   // function _getTValues(
@@ -899,7 +1018,7 @@ contract Singularity is Context, IERC20, Ownable {
   //   return (tTransferAmount, tFee, tTeam);
   // }
 
-  // INLINE ASSEMBLY: now unused
+  // INLINE ASSEMBLY: not unused
   // function _getTValues(
   //   uint256 tAmount,
   //   uint256 redisFee,
@@ -926,7 +1045,7 @@ contract Singularity is Context, IERC20, Ownable {
   //   return (rAmount, rTransferAmount, rFee);
   // }
 
-  // INLINE ASSEMBLY: now unused
+  // INLINE ASSEMBLY: not unused
   // function _getRValues(
   //   uint256 tAmount,
   //   uint256 tFee,
@@ -967,6 +1086,7 @@ contract Singularity is Context, IERC20, Ownable {
     }
   }
 
+  // DEFAULT
   //Set maximum transaction
   // function setMaxTransactionAmount(uint256 maxTxAmount) public onlyOwner {
   //   _maxTxAmount = _tTotal*maxTxAmount/100;
@@ -980,6 +1100,7 @@ contract Singularity is Context, IERC20, Ownable {
     }
   }
 
+  // DEFAULT
   // function setMaxWalletLimit(uint256 maxWalletSize) public onlyOwner {
   // _maxWalletSize = _tTotal*maxWalletSize/100;
   //   require (_maxWalletSize >= _tTotal/100);
