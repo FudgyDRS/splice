@@ -108,14 +108,6 @@ function name() public pure returns (string memory) {
         swapEnabled = _swapEnabled;
     }
 
-    function setBuyAndSellFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) public onlyOwner {
-        _redisFeeOnBuy = redisFeeOnBuy;
-        _redisFeeOnSell = redisFeeOnSell;
-        _taxFeeOnBuy = taxFeeOnBuy;
-        _taxFeeOnSell = taxFeeOnSell;
-        require (_redisFeeOnBuy+_redisFeeOnSell+_taxFeeOnBuy+_taxFeeOnSell <= 25);
-    }
-
     //Set maximum transaction
     function setMaxTransactionAmount(uint256 maxTxAmount) public onlyOwner {
         _maxTxAmount = _tTotal*maxTxAmount/100;
@@ -801,25 +793,25 @@ contract Singularity is Context, IERC20, Ownable {
     if (!takeFee) restoreAllFee();
   }
 
-    function _transferStandard(
-        address sender,
-        address recipient,
-        uint256 tAmount
-    ) private {
-        (
-            uint256 rAmount,
-            uint256 rTransferAmount,
-            uint256 rFee,
-            uint256 tTransferAmount,
-            uint256 tFee,
-            uint256 tTeam
-        ) = _getValues(tAmount);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
-        _takeTeam(tTeam);
-        _reflectFee(rFee, tFee);
-        emit Transfer(sender, recipient, tTransferAmount);
-    }
+  function _transferStandard(
+    address sender,
+    address recipient,
+    uint256 tAmount
+  ) private {
+    (
+      uint256 rAmount,
+      uint256 rTransferAmount,
+      uint256 rFee,
+      uint256 tTransferAmount,
+      uint256 tFee,
+      uint256 tTeam
+    ) = _getValues(tAmount);
+    _rOwned[sender] = _rOwned[sender].sub(rAmount);
+    _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+    _takeTeam(tTeam);
+    _reflectFee(rFee, tFee);
+    emit Transfer(sender, recipient, tTransferAmount);
+  }
 
   function _takeTeam(uint256 tTeam) private {
     uint256 currentRate = _getRate();
@@ -874,6 +866,7 @@ contract Singularity is Context, IERC20, Ownable {
     }
   }
 
+  // DEFAULT
   // function _getTValues(
   //   uint256 tAmount,
   //   uint256 redisFee,
@@ -885,18 +878,20 @@ contract Singularity is Context, IERC20, Ownable {
   //   return (tTransferAmount, tFee, tTeam);
   // }
 
-  function _getTValues(
-    uint256 tAmount,
-    uint256 redisFee,
-    uint256 taxFee
-  ) private pure returns (uint256 tTransferAmount, uint256 tFee, uint256 tTeam) {
-    assembly {
-      tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
-      tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
-      tTransferAmount := sub(tAmount, add(tFee, tTeam))
-    }
-  }
+  // INLINE ASSEMBLY: now unused
+  // function _getTValues(
+  //   uint256 tAmount,
+  //   uint256 redisFee,
+  //   uint256 taxFee
+  // ) private pure returns (uint256 tTransferAmount, uint256 tFee, uint256 tTeam) {
+  //   assembly {
+  //     tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
+  //     tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
+  //     tTransferAmount := sub(tAmount, add(tFee, tTeam))
+  //   }
+  // }
 
+  // DEFAULT
   // function _getRValues(
   //   uint256 tAmount,
   //   uint256 tFee,
@@ -910,26 +905,27 @@ contract Singularity is Context, IERC20, Ownable {
   //   return (rAmount, rTransferAmount, rFee);
   // }
 
-  function _getRValues(
-    uint256 tAmount,
-    uint256 tFee,
-    uint256 tTeam,
-    uint256 currentRate
-  ) private pure returns (uint256 rAmount, uint256 rTransferAmount, uint256 rFee) {
-    assembly {
-      rAmount := mul(mload(tAmount), mload(currentRate))
-      rFee := mul(mload(tFee), mload(currentRate))
-      rTransferAmount := sub(
-        rAmount, 
-        add(
-          mload(rFee), 
-          mul(mload(tTeam), mload(currentRate)))
-      )
-    }
-  }
+  // INLINE ASSEMBLY: now unused
+  // function _getRValues(
+  //   uint256 tAmount,
+  //   uint256 tFee,
+  //   uint256 tTeam,
+  //   uint256 currentRate
+  // ) private pure returns (uint256 rAmount, uint256 rTransferAmount, uint256 rFee) {
+  //   assembly {
+  //     rAmount := mul(mload(tAmount), mload(currentRate))
+  //     rFee := mul(mload(tFee), mload(currentRate))
+  //     rTransferAmount := sub(
+  //       rAmount, 
+  //       add(
+  //         mload(rFee), 
+  //         mul(mload(tTeam), mload(currentRate)))
+  //     )
+  //   }
+  // }
 
     
-
+  // DEFAULT
   // function setBuyAndSellFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) public onlyOwner {
   //   _redisFeeOnBuy = redisFeeOnBuy;
   //   _redisFeeOnSell = redisFeeOnSell;
@@ -938,6 +934,8 @@ contract Singularity is Context, IERC20, Ownable {
   //   require (_redisFeeOnBuy+_redisFeeOnSell+_taxFeeOnBuy+_taxFeeOnSell <= 25);
   // }
 
+
+  // INLINE ASSEMBLY
   function setBuyAndSellFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) public onlyOwner {
     assembly {
       if gt(add(add(add(mload(redisFeeOnBuy), mload(redisFeeOnSell)), mload(taxFeeOnBuy)), mload(taxFeeOnSell)), 25) { revert(0,0) }
