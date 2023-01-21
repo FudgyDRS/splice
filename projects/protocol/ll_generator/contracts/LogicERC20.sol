@@ -799,70 +799,65 @@ contract Singularity is Context, IERC20, Ownable {
   // }
 
   // INLINE ASSEMBLY: not used
-  // function _tokenTransfer(
-  //   address sender,
-  //   address recipient,
-  //   uint256 amount,
-  //   bool takeFee
-  // ) private {
-  //   assembly {
-  //     // if (!takeFee) removeAllFee();
-  //     if iszero(mload(takeFee)) {
-  //       if iszero(and(sload(0x11), sload(0x12))) { return(0) }
-  //       sstore(0x11, sload(0x0F))
-  //       sstore(0x12, sload(0x10))
-  //       sstore(0x0F, 0)
-  //       sstore(0x10, 0)
-  //     }
-  //
-  //     // _transferStandard(sender, recipient, amount);
-  //     let tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
-  //     let tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
-  //     let tTransferAmount := sub(tAmount, add(tFee, tTeam))
-  //     let currentRate     := div(sload(0x09), sload(0x08))
-  //     let rAmount := mul(mload(tAmount), mload(currentRate))
-  //     let rFee := mul(mload(tFee), mload(currentRate))
-  //     let rTransferAmount := sub(
-  //       rAmount, 
-  //       add(
-  //         mload(rFee), 
-  //         mul(mload(tTeam), mload(currentRate)))
-  //     )
-  //
-  //     // _rOwned[sender] = _rOwned[sender].sub(rAmount);
-  //     mstore(0x00, mload(sender))
-  //     mstore(0x20, 0x03)
-  //     let _rOwned := keccak256(0x00, 0x20)
-  //     sstore(_rOwned, sub(sload(_rOwned), mload(rAmount)))
-  //
-  //     // _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
-  //     mstore(0x00, mload(recipient))
-  //     let _rOwned := keccak256(0x00, 0x20)
-  //     sstore(_rOwned, add(sload(_rOwned), mload(rTransferAmount)))
-  //
-  //     // _takeTeam(tTeam);
-  //     let rTeam := mul(mload(tTeam), div(sload(0x09), sload(0x08)))
-  //     mstore(0x00, address())
-  //     mstore(0x20, 0x03)
-  //     let _rOwned := keccak256(0x00, 0x20)
-  //     sstore(_rOwned, add(sload(_rOwned), mload(rTeam)))
-  //
-  //     // _reflectFee(rFee, tFee);
-  //     sstore(0x09, sub(sload(0x09), mload(rFee)))
-  //     sstore(0x0A, add(sload(0x0A), mload(tFee)))
-  //
-  //     // if (!takeFee) restoreAllFee();
-  //     if iszero(mload(takeFee)) {
-  //       sstore(0x0F, sload(0x11))
-  //       sstore(0x10, sload(0x12))
-  //     }
-  //
-  //
-  //   }
-  //   if (!takeFee) removeAllFee();
-  //   _transferStandard(sender, recipient, amount);
-  //   if (!takeFee) restoreAllFee();
-  // }
+  function _tokenTransfer(
+    address sender,
+    address recipient,
+    uint256 amount,
+    bool takeFee
+  ) private {
+    assembly {
+      // if (!takeFee) removeAllFee();
+      if iszero(mload(takeFee)) {
+        if iszero(and(sload(0x11), sload(0x12))) { return(0) }
+        sstore(0x11, sload(0x0F))
+        sstore(0x12, sload(0x10))
+        sstore(0x0F, 0)
+        sstore(0x10, 0)
+      }
+
+      // _transferStandard(sender, recipient, amount);
+      let tFee            := div(mul(mload(tAmount), mload(redisFee)), 100)
+      let tTeam           := div(mul(mload(tAmount), mload(taxFee)), 100)
+      let tTransferAmount := sub(tAmount, add(tFee, tTeam))
+      let currentRate     := div(sload(0x09), sload(0x08))
+      let rAmount := mul(mload(tAmount), mload(currentRate))
+      let rFee := mul(mload(tFee), mload(currentRate))
+      let rTransferAmount := sub(
+        rAmount, 
+        add(
+          mload(rFee), 
+          mul(mload(tTeam), mload(currentRate)))
+      )
+
+      // _rOwned[sender] = _rOwned[sender].sub(rAmount);
+      mstore(0x00, mload(sender))
+      mstore(0x20, 0x03)
+      let _rOwned := keccak256(0x00, 0x20)
+      sstore(_rOwned, sub(sload(_rOwned), mload(rAmount)))
+
+      // _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+      mstore(0x00, mload(recipient))
+      let _rOwned := keccak256(0x00, 0x20)
+      sstore(_rOwned, add(sload(_rOwned), mload(rTransferAmount)))
+
+      // _takeTeam(tTeam);
+      let rTeam := mul(mload(tTeam), div(sload(0x09), sload(0x08)))
+      mstore(0x00, address())
+      mstore(0x20, 0x03)
+      let _rOwned := keccak256(0x00, 0x20)
+      sstore(_rOwned, add(sload(_rOwned), mload(rTeam)))
+
+      // _reflectFee(rFee, tFee);
+      sstore(0x09, sub(sload(0x09), mload(rFee)))
+      sstore(0x0A, add(sload(0x0A), mload(tFee)))
+
+      // if (!takeFee) restoreAllFee();
+      if iszero(mload(takeFee)) {
+        sstore(0x0F, sload(0x11))
+        sstore(0x10, sload(0x12))
+      }
+    }
+  }
 
   // DEFAULT
   // function _transferStandard(
