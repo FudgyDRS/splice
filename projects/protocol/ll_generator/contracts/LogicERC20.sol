@@ -819,12 +819,21 @@ contract Singularity is Context, IERC20, Ownable {
     _rOwned[address(this)] = _rOwned[address(this)].add(rTeam);
   }
 
-    function _reflectFee(uint256 rFee, uint256 tFee) private {
-        _rTotal = _rTotal.sub(rFee);
-        _tFeeTotal = _tFeeTotal.add(tFee);
-    }
+  // DEFAULT
+  // function _reflectFee(uint256 rFee, uint256 tFee) private {
+  //   _rTotal = _rTotal.sub(rFee);
+  //   _tFeeTotal = _tFeeTotal.add(tFee);
+  // }
 
-    receive() external payable {}
+  // INLINE ASSEMBLY
+  function _reflectFee(uint256 rFee, uint256 tFee) private {
+    assembly {
+      sstore(0x09, sub(sload(0x09), mload(rFee)))
+      sstore(0x0A, add(sload(0x0A), mload(tFee)))
+    }
+  }
+
+  receive() external payable {}
 
   // function _getValues(uint256 tAmount) private view returns (
   //   uint256,
