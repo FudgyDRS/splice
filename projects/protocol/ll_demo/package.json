@@ -1,5 +1,5 @@
 {
-  "name": "nft",
+  "name": "token-approve_tax",
   "version": "1.0.0",
   "description": "NFT + APY distributor",
   "main": "index.js",
@@ -14,7 +14,7 @@
     "test:size-contracts": "npx hardhat size-contracts"
   },
   "devDependencies": {
-    "@chainlink/contracts": "^0.5.1",
+    "@chainlink/contracts": "^0.6.1",
     "@openzeppelin/contracts": "^4.8.0"
   }
 }
