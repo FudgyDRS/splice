@@ -1,5 +1,5 @@
-import { assert } from "chai";
-import { artifacts, contract } from "hardhat";
+import { assert, expect } from "chai";
+import { artifacts, contract, ethers } from "hardhat";
 import { BN, constants, expectEvent, expectRevert, ether, time, balance, send } from "@openzeppelin/test-helpers";
 import { parseEther, formatUnits } from "ethers/lib/utils";
 import { transferableAbortController } from "util";
@@ -57,6 +57,14 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
     // Set the Base URI
     await mainNFT.setBaseURI(mockURI, { from: owner });
+
+    const mint1 = await mainNFT.methods.overloading().call();
+    const mint2 = await mainNFT.methods.overloading("address,uint256").call();
+
+    /*
+    await expectRevert(mainNFT.methods['mint(address,uint256)']
+        .sendTransaction(users[0], totalSupply, { from: users[0] }), 'Ownable: caller is not the owner');
+        */
   });
 
   describe("#1 - Normal behavior", async () => {
