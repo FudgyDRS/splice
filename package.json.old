@@ -1,0 +1,54 @@
+{
+  "name": "splice-contracts",
+  "description": "Splice contracts",
+  "version": "1.0.0",
+  "private": true,
+  "explorer.autoRevealExclude": {
+    "**/node_modules": true,
+    "**/bower_components": true
+  },
+  "workspaces": [
+    "projects/nft/*",
+    "projects/token/*"
+  ],
+  "repository": "https://github.com/fudgydrs/splice-contracts",
+  "author": "Splice",
+  "license": "MIT",
+  "scripts": {
+    "format:check": "prettier --check 'projects/**/**/*.{js,ts,sol}'",
+    "format:write": "prettier --write 'projects/**/**/*.{js,ts,sol}'",
+    "prepare": "husky install",
+    "test": "lerna run test"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.4.2",
+    "@commitlint/config-conventional": "^17.4.2",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.6",
+    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-truffle5": "^2.0.7",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/test-helpers": "^0.5.16",
+    "@pancakeswap/eslint-config-pancake": "^1.2.0",
+    "@pancakeswap/pancake-swap-lib": "^0.0.4",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.13.0",
+    "chai": "^4.3.7",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.33.0",
+    "ethereum-waffle": "^4.0.9",
+    "ethers": "^6.0.2",
+    "hardhat": "^2.12.6",
+    "hardhat-abi-exporter": "^2.10.1",
+    "hardhat-contract-sizer": "^2.8.0",
+    "hardhat-watcher": "^2.5.0",
+    "husky": "^8.0.3",
+    "lerna": "^6.4.1",
+    "prettier": "^2.8.4",
+    "prettier-plugin-solidity": "^1.1.2",
+    "solidity-coverage": "^0.8.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5",
+    "web3": "^1.8.2"
+  }
+}
