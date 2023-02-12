@@ -23,19 +23,19 @@ A calls B
   */
 
 contract Jobs {
-  constructor() paayable{
+  constructor() payable {
     assembly {
-      sstore(0x00, caller)
+      sstore(0x00, caller())
     }
   }
   function initalize() external payable {
     assembly {
-      if iszero(eq(caller, sload(0x00))) { revert(0,0) } // needs a proper error msg
+      if iszero(eq(caller(), sload(0x00))) { revert(0,0) } // needs a proper error msg
     }
   }
   function createSystemJob() external payable {
     assembly {
-      if iszero(eq(caller, sload(0x02))) { revert(0,0) } // needs a proper error msg
+      if iszero(eq(caller(), sload(0x02))) { revert(0,0) } // needs a proper error msg
     }
   }
 
@@ -51,12 +51,13 @@ contract Jobs {
     */
   function systemJob() external {
     assembly {
-      if iszero(eq(caller, sload(0x00))) { revert(0,0) } // needs a proper error msg
+      if iszero(eq(caller(), sload(0x00))) { revert(0,0) } // needs a proper error msg
       calldatacopy(0x40, 0x04, 0x20) // only variable is gas 
                                      // this command to get gas variable must be double checked
 
       // how to use gas, need to extract gas limit from calldata
-      let i_old := sload(i.slot) // examaple arbitrary execution entry point
+      //let i_old := sload(i.slot) // examaple arbitrary execution entry point
+      let i_old
       let gasLeft := gas()
       let gasUsed // save extra gas to set i
       let newGasLeft
@@ -68,7 +69,7 @@ contract Jobs {
           if gt(gasLeft, newGasLeft) { gasUsed := sub(add(gasUsed, gasLeft), newGasLeft) }
           gasLeft := newGasLeft
       }
-      sstore(i.slot, i_old)
+      //sstore(i.slot, i_old)
     }
   }
 }
