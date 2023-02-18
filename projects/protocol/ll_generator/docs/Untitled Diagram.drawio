@@ -1,0 +1,103 @@
+<mxfile host="app.diagrams.net" modified="2023-02-17T09:43:55.334Z" agent="5.0 (Windows)" etag="qb67nuCe2EEQOa-_fctj" version="20.8.16" type="github">
+  <diagram name="Page-1" id="QkQTOyqdhcAUaQ4kZpgD">
+    <mxGraphModel dx="2899" dy="1066" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-35" value="" style="swimlane;startSize=0;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="-230" y="5" width="930" height="505" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-36" value="&lt;b&gt;Transfer Bridge Funds to contract and create event to log funds on database&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-35">
+          <mxGeometry x="20" y="15" width="180" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="QyYDhKRWqpRVJ_-lQAJw-1" target="QyYDhKRWqpRVJ_-lQAJw-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="QyYDhKRWqpRVJ_-lQAJw-1" target="QyYDhKRWqpRVJ_-lQAJw-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-1" value="&lt;div&gt;Stored Bridge Job in Paid or Free Tier&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-180" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-7" value="&lt;div&gt;Bridge Lender Event&lt;br&gt;&lt;/div&gt;&amp;nbsp;(Floating)" style="swimlane;whiteSpace=wrap;html=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="190" y="340" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-10" value="Deadline" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-7">
+          <mxGeometry y="70" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-11" value="Amount Token A" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-7">
+          <mxGeometry y="30" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-12" value="Max Profit" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-7">
+          <mxGeometry y="90" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-13" value="&lt;strike&gt;Amount Token B&lt;/strike&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-7">
+          <mxGeometry y="50" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-14" value="Min Profit" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-7">
+          <mxGeometry y="110" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-8" value="&lt;div&gt;Bridge Request Event&lt;br&gt;&lt;/div&gt;" style="swimlane;whiteSpace=wrap;html=1;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="190" y="40" width="200" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-20" value="Deadline" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-8">
+          <mxGeometry y="60" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-21" value="Amount Token A" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-8">
+          <mxGeometry y="20" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-22" value="Max Loss" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-8">
+          <mxGeometry y="80" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-23" value="Amount Token B" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-8">
+          <mxGeometry y="40" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-24" value="&lt;div&gt;Min Loss&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-8">
+          <mxGeometry y="100" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-9" value="&lt;div&gt;Bridge Lend Event&lt;br&gt;&lt;/div&gt;&amp;nbsp;(Non-Floating)" style="swimlane;whiteSpace=wrap;html=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="450" y="172" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-15" value="Deadline" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-9">
+          <mxGeometry y="70" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-16" value="Amount Token A" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-9">
+          <mxGeometry y="30" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-17" value="Max Profit" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-9">
+          <mxGeometry y="90" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-18" value="Amount Token B" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-9">
+          <mxGeometry y="50" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-19" value="Min Profit" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="QyYDhKRWqpRVJ_-lQAJw-9">
+          <mxGeometry y="110" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="QyYDhKRWqpRVJ_-lQAJw-25" target="QyYDhKRWqpRVJ_-lQAJw-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-25" value="Bridge Request Created" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="10" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="QyYDhKRWqpRVJ_-lQAJw-26" target="QyYDhKRWqpRVJ_-lQAJw-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-26" value="Bridge Lend Created" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="10" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.01;entryY=0.9;entryDx=0;entryDy=0;entryPerimeter=0;jumpStyle=none;metaEdit=1;" edge="1" parent="1" source="QyYDhKRWqpRVJ_-lQAJw-29" target="QyYDhKRWqpRVJ_-lQAJw-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="QyYDhKRWqpRVJ_-lQAJw-29" target="QyYDhKRWqpRVJ_-lQAJw-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-29" value="&lt;div&gt;Price&lt;/div&gt;&lt;div&gt;Floats&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="200" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="QyYDhKRWqpRVJ_-lQAJw-37" value="&lt;font color=&quot;#000000&quot;&gt;zfvsd&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=default;fontColor=#FF0000;" vertex="1" parent="1">
+          <mxGeometry x="850" y="60" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
