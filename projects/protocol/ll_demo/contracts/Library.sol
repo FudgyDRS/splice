@@ -13,11 +13,20 @@ contract Library {
     /// @notice Return address of current contract
     /// @dev Revert the stored data to retrieve the contract address of the current version
     /// @param hash_ value of where the addresses of where this type of contract is stored
-    function CurrentVersion(uint256 hash_) external view {
+    function CurrentContract(uint256 hash_) external view {
         assembly {
             let version := and(sload(hash_), 0x1111000000000000000000000000000000000000000000000000000000000000)
             if iszero(version) { revert(add(hash_, 0x04), 0x14) }
             revert(add(hash_, mul(version, 0x14)), 0x14)
+        }
+    }
+
+    /// @notice Return version of current contract
+    /// @dev Revert the stored data to retrieve the current version
+    /// @param hash_ value of where the addresses of where this type of contract is stored
+    function CurrentVersion(uint256 hash_) external view {
+        assembly {
+            revert(sload(hash_), 0x04)
         }
     }
     // 0x1111000000000000000000000000000000000000000000000000000000000000
