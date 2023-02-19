@@ -22,7 +22,7 @@ contract ContractState {
     function CurrentContract() external virtual view returns(address contract_) {
         assembly {
             // bytes4(keccak256("CurrentContract(uint256)"))
-            mstore(0, 0xdee8bc3200000000000000000000000000000000000000000000000000000000) // bytes4(keccak256(owner()))
+            mstore(0, 0xdee8bc3200000000000000000000000000000000000000000000000000000000)
             mstore(0x04, sload(0x03))
             pop(staticcall(
                 gas(), //6000 for default
@@ -38,11 +38,11 @@ contract ContractState {
 
     /// @notice Get contract version
     /// @dev Revert the stored data to retrieve the current version
-    /// @return contract_ is the current most contract version
+    /// @return version_ is the current most contract version
     function CurrentVersion() external virtual view returns(uint256 version_) {
         assembly {
             // bytes4(keccak256("CurrentVersion(uint256)"))
-            mstore(0, 0xb9e4c63700000000000000000000000000000000000000000000000000000000) // bytes4(keccak256(owner()))
+            mstore(0, 0xb9e4c63700000000000000000000000000000000000000000000000000000000)
             mstore(0x04, sload(0x03))
             pop(staticcall(
                 gas(), //6000 for default
@@ -53,6 +53,26 @@ contract ContractState {
                 0x20
             ))
             version_ := mload(0)
+        }
+    }
+
+    /// @notice Return the operator set gas price
+    /// @dev Revert the stored data to retrieve the gas to be used for external processing
+    /// @return gas_ is the gas to be used for external processing
+    function Gas() external virtual view returns(uint256 gas_) {
+        assembly {
+            // bytes4(keccak256("Gas()"))
+            mstore(0, 0x04a55cbf00000000000000000000000000000000000000000000000000000000)
+            mstore(0x04, sload(0x03))
+            pop(staticcall(
+                gas(), //6000 for default
+                sload(0x02),
+                0,
+                0x04,
+                0,
+                0x20
+            ))
+            gas_ := mload(0)
         }
     }
 }

@@ -3,6 +3,7 @@ pragma solidity ^0.8.18;
 
 contract Library {
     // 0x00     owner
+    // 0xa4dbc2ea4e0c916dab703fd999a50f7a4a9c768025afa47088dada2561eb7afe keccak256("GAS")
     // 0x8ae85d849167ff996c04040c44924fd364217285e4cad818292c7ac37c0a345b keccak256("ERC20")
     // 0x7de123e9171e34bc63bbe13af473fa2f468c8ca4d92d344acf9e2f11c7cac896 keccak256("ERC20_Reflection")
     // 0x73ad2146b3d3a286642c794379d750360a2d53a3459a11b3e5d6cc900f55f44a keccak256("ERC721")
@@ -27,6 +28,14 @@ contract Library {
     function CurrentVersion(uint256 hash_) external view {
         assembly {
             revert(sload(hash_), 0x04)
+        }
+    }
+
+    /// @notice Return the operator set gas price
+    /// @dev Revert the stored data to retrieve the gas to be used for external processing
+    function Gas() external view {
+        assembly {
+            revert(sload(0xa4dbc2ea4e0c916dab703fd999a50f7a4a9c768025afa47088dada2561eb7afe), 0x20)
         }
     }
     // 0x1111000000000000000000000000000000000000000000000000000000000000
