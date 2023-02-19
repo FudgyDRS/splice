@@ -17,9 +17,15 @@ A calls B
   *   0x01    initialized
   *   0x02    owner
   *   0x03    admin dynamic (TBA)
-  *   0x04    system job dynamic
-  *   0x05    paid job dynamic
-  *   0x06    free job dynamic
+  *   0x04    system job gas
+  *   0x05    paid job gas
+  *   0x06    free job gas
+  *   0x07    system job dynamic
+  *   0x08    paid job dynamic
+  *     0xe33c290272880447f00f1a5b33f9e077b5cb5c8c71b08c563e83761acb70e8d1
+  *     keccak256(0x08):            Jobs size
+  *     add(keccak256(0x08), 0x20): Last processed
+  *   0x09    free job dynamic
   */
 
 contract Jobs {
@@ -35,6 +41,68 @@ contract Jobs {
   }
   function createSystemJob() external payable {
     assembly {
+      if iszero(eq(caller(), sload(0x02))) { revert(0,0) } // needs a proper error msg
+    }
+  }
+
+
+  function createPaidJob(address contract_, uint256 gas_, bytes4 data_) external payable {
+    assembly {
+      if gt(gas_, sload(0x06)) { revert(0,0) } // needs a proper error msg
+      let success := call(
+          gas_,
+          contract_,
+          0,
+          data_,
+          0x04,
+          0x20,
+          0x20
+      )
+      switch success
+        case 0 {
+          // bytes4(keccak256("Failed to run automation"))
+          mstore(0, 0x0800e4b1635f) // This is likely bad code or insufficent gas for contract_
+          revert(0, 0x40)
+        }
+        default {
+          let job_ := and(contract_, and(shl(gas_, 0x04), data_))
+          let jobs_ := 0xe33c290272880447f00f1a5b33f9e077b5cb5c8c71b08c563e83761acb70e8d1
+          let size_ := sload(jobs_)
+          sstore(jobs_, add(size_, 1))
+          sstore(add(jobs_, mul(size_, 0x20)), job_)
+          log1(0, 0, 0) // need to log added job
+        }
+
+      if iszero(eq(caller(), sload(0x02))) { revert(0,0) } // needs a proper error msg
+    }
+  }
+
+  // Needs work, store large executable data is unpractical but could done via emit
+  function createPaidJob_unlimited(address contract_, uint256 gas_, bytes calldata) external payable {
+    assembly {
+      if gt(gas_, sload(0x06)) { revert(0,0) } // needs a proper error msg
+      let ptr := mload(0x40)
+      let call_size := sub(calldatasize(), 0x34)
+      calldatacopy(ptr, 0x34, call_size)
+      let success := call(
+          gas_,
+          contract_,
+          0,
+          ptr,
+          call_size,
+          0x20,
+          0x20
+      )
+      switch success
+        case 0 {
+          mstore(0, 0x0800e4b1635f) // This is likely bad code or insufficent gas for contract_
+          revert(0, 0x40)
+        }
+        default {
+          log1(0, 0, 0) // need to log added job
+                        // This will likely be a 'logi' event
+        }
+
       if iszero(eq(caller(), sload(0x02))) { revert(0,0) } // needs a proper error msg
     }
   }
