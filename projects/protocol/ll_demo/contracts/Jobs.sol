@@ -45,6 +45,7 @@ contract Jobs {
     }
   }
 
+  function processPaidJobs() external payable {}
 
   function createPaidJob(address contract_, uint256 gas_, bytes4 data_) external payable {
     assembly {
