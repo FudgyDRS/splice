@@ -113,10 +113,10 @@ contract Jobs {
     * Motive: System jobs are a high priority protocol operation
     *         These jobs can live on a timer like scheduled updates without 
     *         reliance on external systems.
-    *         Additionally, concesus mechanisms can be delgated through these jobs
+    *         Additionally, concesus mechanisms can be delegated through these jobs
     *
     * Execution: Jobs need an execution limit and need to be rewritten in yul
-    *            (built-in automatation can be better regulated to internal standards)
+    *            (built-in automatation can be better regulated by internal standards)
     */
   function systemJob() external {
     assembly {
