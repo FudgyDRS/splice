@@ -47,6 +47,30 @@ contract Jobs {
 
   function processPaidJobs() external payable {}
 
+  /**
+    * @notice
+    * Paid jobs:
+    * Motive: Paid jobs are a medium priority protocol operations
+    *         These jobs are paid in some medium of token/liquidity/currency to
+    *         perform automation tasks on their own contracts.
+    *
+    *         The constraint of these paid jobs is that these jobs ONLY supply gas, 
+    *         not calldata. This is enforced by only accepting the first four bytes 
+    *         of calldata at location 0x64 (first four bytes of data_).
+    *
+    * Execution: Jobs need an execution limit and need to be rewritten in yul
+    *            (built-in automatation can be better regulated by internal standards)
+    *
+    * 0x1234567890123456789012345678901234567890123456789012345678901234
+    * 0xAddress                                 Gas             Selector
+    * Because addresses are stored big endian and numbers are stored little endian,
+    * we can more efficently combine the parts into a single 256 number.
+    * 
+    * In this instance counting in big endian (left to right):
+    * @param contract_  0x00 ~ 0x13: Address target for the paid job
+    * @param gas_       0x13 ~ 0x1B: Gas limit for the operation
+    * @param data_      0x1C ~ 0x1F: Function selector to be executed
+    */
   function createPaidJob(address contract_, uint256 gas_, bytes4 data_) external payable {
     assembly {
       if gt(gas_, sload(0x06)) { revert(0,0) } // needs a proper error msg
@@ -109,9 +133,10 @@ contract Jobs {
   }
 
   /**
+    * @notice
     * System jobs:
-    * Motive: System jobs are a high priority protocol operation
-    *         These jobs can live on a timer like scheduled updates without 
+    * Motive: System jobs are a high priority protocol operations
+    *         These jobs can live on a timer, like scheduled updates, without 
     *         reliance on external systems.
     *         Additionally, concesus mechanisms can be delegated through these jobs
     *
