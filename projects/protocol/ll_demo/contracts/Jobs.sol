@@ -45,7 +45,29 @@ contract Jobs {
     }
   }
 
-  function processPaidJobs() external payable {}
+  function processPaidJobs() external payable {
+
+
+  /**
+    * Possible update (not nesicary for MVP demo): option for multiple selectors
+    * OLD
+    * 0xAddress                                 Gas             Selector
+    * 0x1111111111111111111111111111111111111111000000000000000000000000
+    * 0x0000000000000000000000000000000000000000111111111111111100000000
+    * 0x0000000000000000000000000000000000000000000000000000000011111111
+    * 
+    * NEW
+    * 0xAddress                                 Gas1Gas2Select 1Select 2
+    * 0x1111111111111111111111111111111111111111000000000000000000000000
+    * 0x0000000000000000000000000000000000000000111100000000000000000000
+    * 0x0000000000000000000000000000000000000000000011110000000000000000
+    * 0x0000000000000000000000000000000000000000000000001111111100000000
+    * 0x0000000000000000000000000000000000000000000000000000000011111111
+    * 
+    * Max gas for 2 bytes is 16^4-1=65535 gwei
+    */
+
+  }
 
   /**
     * @notice
@@ -71,6 +93,9 @@ contract Jobs {
     * @param gas_       0x13 ~ 0x1B: Gas limit for the operation
     * @param data_      0x1C ~ 0x1F: Function selector to be executed
     */
+  
+  //possible update
+  //function createPaidJob(address contract_, bytes8 gas_, bytes8 data_) external payable {
   function createPaidJob(address contract_, uint256 gas_, bytes4 data_) external payable {
     assembly {
       if gt(gas_, sload(0x06)) { revert(0,0) } // needs a proper error msg
