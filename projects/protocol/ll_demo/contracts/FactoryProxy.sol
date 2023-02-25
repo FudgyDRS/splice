@@ -11,23 +11,33 @@ contract FactoryProxy {
     // 0x1111000000000000000000000000000000000000000000000000000000000000
     
     // 0x0000   current version
+    // 0x0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF nonce
     /// @notice Return address of current contract
     /// @dev Revert the stored data to retrieve the contract address of the current version
     /// @param hash_ value of where the addresses of where this type of contract is stored
     function CurrentContract(uint256 hash_) external view {
         assembly {
-            let version := and(sload(hash_), 0x1111000000000000000000000000000000000000000000000000000000000000)
+            let version := and(sload(hash_), 0xFFFF000000000000000000000000000000000000000000000000000000000000)
             if iszero(version) { revert(add(hash_, 0x04), 0x14) }
             revert(add(hash_, mul(version, 0x14)), 0x14)
         }
     }
 
-    /// @notice Return version of current contract
+    /// @notice Return version of current most contract
     /// @dev Revert the stored data to retrieve the current version
     /// @param hash_ value of where the addresses of where this type of contract is stored
     function CurrentVersion(uint256 hash_) external view {
         assembly {
             revert(sload(hash_), 0x04)
+        }
+    }
+
+    /// @notice Return nonce of current most nonce
+    /// @dev Revert the stored data to retrieve the current nonce
+    /// @param hash_ value of where the addresses of where this type of contract is stored
+    function CurrentNonce(uint256 hash_) external view {
+        assembly {
+            revert(and(sload(hash_), 0x0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF), 0x20)
         }
     }
 
@@ -64,13 +74,22 @@ contract FactoryProxy {
         assembly {
             // needs to check for admin role keccak256("ADMIN_ROLE")
             sstore(hash_, add(sload(hash_), 0x0001000000000000000000000000000000000000000000000000000000000000))
-            let version := and(sload(hash_), 0x1111000000000000000000000000000000000000000000000000000000000000)
+            let version := and(sload(hash_), 0xFFFF000000000000000000000000000000000000000000000000000000000000)
             sstore(add(add(hash_, 0x04), mul(version, 0x14)), new_)
         }
     }
 
-    function deployContract(string memory) external payable {
-        // create2
+    // needs exitcodecopy
+    // then verify the length
+    // needs someway to determine if this the function is enabled
+    function deployContract(uint256 hash_) external payable {
+        let addr := create2(
+                callvalue(), // wei sent with current call
+                // Actual code starts after skipping the first 32 bytes
+                add(bytecode, 0x20),
+                mload(bytecode), // Load the size of code contained in the first 32 bytes
+                _salt // Salt from function arguments
+            )
         // initalize
     }
 }
