@@ -14,6 +14,7 @@ This repo contains all the contracts used in Splice. It is divided in independen
 |[Low Level Gen](./projects/protocol/ll_generator/)  |generation protocol utilizing proxy logic      |0.8.17             |
 
 ### System Architecture
+![alt text](https://github.com/FudgyDRS/splice/blob/master/projects/protocol/ll_demo/docs/diagram.jpg)
 ![alt text](https://github.com/FudgyDRS/splice/blob/master/projects/protocol/ll_demo/docs/System%20ISM.png)
 
 
