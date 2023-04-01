@@ -13,6 +13,9 @@ This repo contains all the contracts used in Splice. It is divided in independen
 |[Approve Tax](./projects/token/approve_tax/)        |impose a tax on any set approval of tokens     |0.8.17             |
 |[Low Level Gen](./projects/protocol/ll_generator/)  |generation protocol utilizing proxy logic      |0.8.17             |
 
+### System Architecture
+![alt text](https://github.com/FudgyDRS/splice/blob/master/projects/protocol/ll_demo/docs/System%20ISM.png)
+
 
 ### Create a new project
 
