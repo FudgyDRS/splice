@@ -1,3 +1,6 @@
+# Splice
+Splice is a infra level project that supports low-cost smart contract deployment and asyncrounous smart contract execution 
+
 ## Splice Contracts
 
 This repo contains all the contracts used in Splice. It is divided in independent projects where each of them contains its smart contracts, test environment and unique config files.
